@@ -1,7 +1,9 @@
 import express, { Application } from "express";
 import cors from "cors";
+import mongoose from "mongoose";
 
-import { PORT, CLIENT_DOMAIN } from "./util/environment";
+import { PORT, CLIENT_DOMAIN, MONGO_URL } from "./util/environment";
+import userRouter from "./routes/userRoutes";
 
 const app: Application = express();
 
@@ -17,5 +19,12 @@ app.use(
 );
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
+
+mongoose
+	.connect(MONGO_URL as string)
+	.then((_result) => console.log("connected to mongoDB!"))
+	.catch((err) => console.log(err));
+
+app.use(userRouter);
 
 app.listen(PORT, () => console.log(`server listening on port ${PORT}`));
