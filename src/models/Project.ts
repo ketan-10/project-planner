@@ -1,6 +1,13 @@
-import { Schema, model } from "mongoose";
+import { Schema, model, Document } from "mongoose";
 
-const projectSchema = new Schema({
+export interface IProject extends Document {
+	projectName: string;
+	description: string;
+	userIds: Array<string>;
+	columnIds: Array<string>;
+}
+
+export const ProjectSchema = new Schema({
 	projectName: {
 		type: String,
 		required: true,
@@ -10,4 +17,5 @@ const projectSchema = new Schema({
 	columnIds: Array,
 });
 
-export default model("project", projectSchema);
+const Project = model<IProject>("project", ProjectSchema);
+export default Project;

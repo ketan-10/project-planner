@@ -1,6 +1,11 @@
-import { Schema, model } from "mongoose";
+import { Schema, model, Document } from "mongoose";
 
-const columnSchema = new Schema({
+export interface IColumn extends Document {
+	columnName: string;
+	ticketIds: Array<string>;
+}
+
+export const ColumnSchema = new Schema({
 	columnName: {
 		type: String,
 		required: true,
@@ -8,4 +13,5 @@ const columnSchema = new Schema({
 	ticketIds: Array,
 });
 
-export default model("column", columnSchema);
+const Column = model<IColumn>("column", ColumnSchema);
+export default Column;

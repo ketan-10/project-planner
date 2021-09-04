@@ -1,6 +1,11 @@
-import { Schema, model } from "mongoose";
+import { Schema, model, Document } from "mongoose";
 
-const ticketSchema = new Schema({
+export interface ITicket extends Document {
+	title: string;
+	description: string;
+}
+
+export const TicketSchema = new Schema({
 	title: {
 		type: String,
 		required: true,
@@ -8,4 +13,5 @@ const ticketSchema = new Schema({
 	description: String,
 });
 
-export default model("ticket", ticketSchema);
+const Ticket = model<ITicket>("ticket", TicketSchema);
+export default Ticket;
