@@ -7,12 +7,6 @@ import * as userService from "../services/user.service";
 
 export const signup = async (req: Request, res: Response) => {
 	const { username, password } = req.body;
-	if (!(username && password)) {
-		return res.status(400).json({
-			success: false,
-			message: "username or password cannot be empty",
-		});
-	}
 	try {
 		const savedUser = await userService.saveUser(username, password);
 		return res.json({
@@ -21,9 +15,10 @@ export const signup = async (req: Request, res: Response) => {
 		});
 	} catch (err: any) {
 		if (err.code === 11000) {
+			//unique key error code
 			return res.status(400).json({
 				success: false,
-				message: "duplicate username",
+				errors: ["duplicate username"],
 			});
 		}
 		return res.sendStatus(500);
@@ -32,12 +27,6 @@ export const signup = async (req: Request, res: Response) => {
 
 export const login = async (req: Request, res: Response) => {
 	const { username, password } = req.body;
-	if (!(username && password)) {
-		return res.status(400).json({
-			success: false,
-			message: "username or password cannot be empty",
-		});
-	}
 	const userId = await userService.comparePassword(username, password);
 	if (userId) {
 		req.session.userId = userId; //store userId in session
@@ -48,6 +37,6 @@ export const login = async (req: Request, res: Response) => {
 	}
 	return res.status(401).json({
 		success: false,
-		message: "invalid credentials",
+		errors: ["invalid credentials"],
 	});
 };

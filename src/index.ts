@@ -28,7 +28,7 @@ const redisClient = redis.createClient({
 
 const app: Application = express();
 //adding logging middleware
-app.use(morgan("short"));
+app.use(morgan("tiny"));
 /*
     Adding cors, form-body and json middlewares
     going to use cookies so setting credentials to true, and allowing fixed origin
