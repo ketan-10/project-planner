@@ -5,7 +5,6 @@ const ticketSchema = new Schema({
 		type: String,
 		required: true,
 	},
-	position: Number,
 	description: String,
 });
 

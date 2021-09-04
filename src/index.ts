@@ -15,10 +15,10 @@ import {
 	SESSION_SECRET,
 	PROD,
 } from "./util/environment";
-import projectRoutes from "./routes/projectRoutes";
-import userRoutes from "./routes/userRoutes";
-import columnRoutes from "./routes/columnRoutes";
-import ticketRoutes from "./routes/ticketRoutes";
+import projectRoutes from "./routes/project.routes";
+import userRoutes from "./routes/user.routes";
+import columnRoutes from "./routes/column.routes";
+import ticketRoutes from "./routes/ticket.routes";
 
 const RedisStore = connectRedis(session);
 const redisClient = redis.createClient({

@@ -5,6 +5,8 @@ const projectSchema = new Schema({
 		type: String,
 		required: true,
 	},
+	description: String,
+	userIds: Array,
 	columnIds: Array,
 });
 

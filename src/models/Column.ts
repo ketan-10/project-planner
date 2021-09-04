@@ -5,10 +5,6 @@ const columnSchema = new Schema({
 		type: String,
 		required: true,
 	},
-	position: {
-		type: Number,
-		required: true,
-	},
 	ticketIds: Array,
 });
 

@@ -1,6 +1,6 @@
 import bcrypt from "bcryptjs";
 
-import UserModel, { IUser } from "../models/UserModel";
+import UserModel, { IUser } from "../models/User";
 
 export const saveUser = async (
 	username: string,

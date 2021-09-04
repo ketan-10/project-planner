@@ -3,7 +3,7 @@
 import { Request, Response } from "express";
 import lodash from "lodash";
 
-import * as userService from "../services/userService";
+import * as userService from "../services/user.service";
 
 export const signup = async (req: Request, res: Response) => {
 	const { username, password } = req.body;
