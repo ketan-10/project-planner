@@ -4,6 +4,7 @@ import { Request, Response } from "express";
 import lodash from "lodash";
 
 import * as userService from "../services/user.service";
+import log from "../util/logger";
 
 export const signup = async (req: Request, res: Response) => {
 	const { username, password } = req.body;
@@ -47,6 +48,7 @@ export const logout = async (req: Request, res: Response) => {
 			if (err) {
 				return res.sendStatus(500);
 			}
+			res.clearCookie("connect.sid"); //clear coookie
 			return res.status(200).json({
 				success: true,
 				message: "logged out successfully!",
