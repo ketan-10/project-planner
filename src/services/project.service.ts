@@ -1,5 +1,37 @@
-import ProjectModel from "../models/Project";
+import ProjectModel, { IProject } from "../models/Project";
 import * as userService from "../services/user.service";
+import log from "../util/logger";
+
+export const getUserProjects = async (
+	userId: string
+): Promise<Array<Partial<IProject>>> => {
+	try {
+		const projectIds = await userService.getProjectIds(userId);
+		const projects = await ProjectModel.find(
+			{
+				_id: {
+					$in: projectIds,
+				},
+			},
+			{
+				projectName: 1,
+				projectDescription: 1,
+			}
+		);
+		return projects;
+	} catch (err) {
+		return Promise.reject(null);
+	}
+};
+
+export const getOneProject = async (projectId: string): Promise<IProject> => {
+	try {
+		const project = await ProjectModel.findById(projectId);
+		return project!;
+	} catch (err) {
+		return Promise.reject(null);
+	}
+};
 
 export const createProject = async (
 	project: object,

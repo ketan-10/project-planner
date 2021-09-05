@@ -31,15 +31,44 @@ export const validateUsernamePassword = async (
 	return next();
 };
 
-export const validateProjectName = async (
+export const validateProjectNameDescription = async (
 	req: Request,
 	res: Response,
 	next: NextFunction
 ) => {
 	try {
-		await check("projectName")
+		await body("projectName")
 			.notEmpty()
 			.withMessage("projectName must be present")
+			.isLength({ max: 20 })
+			.withMessage("project name must be max 20 characters long")
+			.run(req);
+		await body("description")
+			.isLength({ max: 200 })
+			.withMessage("description must be max 200 characters long")
+			.run(req);
+		const validatonErrors = validationResult(req);
+		if (validatonErrors && !validatonErrors.isEmpty()) {
+			return res.status(400).json({
+				success: false,
+				errors: validatonErrors["errors"],
+			});
+		}
+	} catch (err) {
+		return res.sendStatus(400);
+	}
+	return next();
+};
+
+export const validateProjectId = async (
+	req: Request,
+	res: Response,
+	next: NextFunction
+) => {
+	try {
+		await check("projectId")
+			.notEmpty()
+			.withMessage("project id must be present")
 			.run(req);
 
 		const validatonErrors = validationResult(req);

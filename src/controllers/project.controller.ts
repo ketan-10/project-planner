@@ -5,6 +5,7 @@ import { Request, Response, NextFunction } from "express";
 import lodash from "lodash";
 
 import * as projectService from "../services/project.service";
+import log from "../util/logger";
 
 /**
  * ?Add project:
@@ -30,7 +31,7 @@ import * as projectService from "../services/project.service";
 export const addProject = async (req: Request, res: Response) => {
 	try {
 		const projectId = await projectService.createProject(
-			lodash.pick(req.body, ["projectName", "projectDescription"]),
+			lodash.pick(req.body, ["projectName", "description"]),
 			req.session.userId!
 		);
 		if (projectId) {
@@ -43,6 +44,58 @@ export const addProject = async (req: Request, res: Response) => {
 		} else {
 			return res.sendStatus(500);
 		}
+	} catch (err) {
+		return res.sendStatus(500);
+	}
+};
+
+export const getAllProjects = async (req: Request, res: Response) => {
+	try {
+		if (req.session.projectId) {
+			req.session.projectId = null; //if has open project, close it.
+		}
+		const projects = await projectService.getUserProjects(
+			req.session.userId!
+		);
+		if (projects) {
+			return res.status(200).json({
+				success: true,
+				data: {
+					projects,
+				},
+			});
+		} else {
+			return res.sendStatus(500);
+		}
+	} catch (err) {
+		return res.sendStatus(500);
+	}
+};
+
+export const openProject = async (req: Request, res: Response) => {
+	try {
+		const { projectId } = req.params;
+		const project = await projectService.getOneProject(projectId);
+		req.session.projectId = project._id; //opened a project
+		return res.status(200).json({
+			status: 200,
+			data: project,
+		});
+	} catch (err) {
+		if (!err) {
+			return res.sendStatus(404);
+		}
+		return res.sendStatus(500);
+	}
+};
+
+export const closeProject = async (req: Request, res: Response) => {
+	try {
+		req.session.projectId = null;
+		return res.status(200).json({
+			success: true,
+			message: "project closed",
+		});
 	} catch (err) {
 		return res.sendStatus(500);
 	}

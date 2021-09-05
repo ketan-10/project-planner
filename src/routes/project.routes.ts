@@ -8,6 +8,12 @@ const router = Router();
 
 router.use(auth.isLoggedIn);
 
-router.post("/", validator.validateProjectName, projectController.addProject);
+router.post(
+	"/",
+	validator.validateProjectNameDescription,
+	projectController.addProject
+);
+router.get("/", projectController.getAllProjects);
+router.get("/:projectId", projectController.openProject);
 
 export default router;
