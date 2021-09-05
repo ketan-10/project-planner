@@ -89,6 +89,45 @@ export const openProject = async (req: Request, res: Response) => {
 	}
 };
 
+export const updateProject = async (req: Request, res: Response) => {
+	try {
+		const { projectId } = req.params;
+		const { projectName, description } = req.body;
+		const updatedProject = await projectService.updateProject(projectId, {
+			projectName,
+			description,
+		});
+		return res.status(200).json({
+			success: true,
+			data: lodash.pick(updatedProject, ["projectName", "description"]),
+		});
+	} catch (err) {
+		if (!err) {
+			return res.sendStatus(404);
+		}
+		return res.sendStatus(500);
+	}
+};
+
+export const deleteProject = async (req: Request, res: Response) => {
+	const { projectId } = req.params;
+	try {
+		const result = await projectService.deleteProject(
+			req.session.userId!,
+			projectId
+		);
+		return res.status(200).json({
+			success: true,
+			data: result,
+		});
+	} catch (err) {
+		if (!err) {
+			return res.sendStatus(404);
+		}
+		return res.sendStatus(500);
+	}
+};
+
 export const closeProject = async (req: Request, res: Response) => {
 	try {
 		req.session.projectId = null;

@@ -49,9 +49,50 @@ export const createProject = async (
 	}
 };
 
-export const updateProject = async () => {};
+export const updateProject = async (
+	projectId: string,
+	project: Partial<IProject>
+): Promise<Partial<IProject>> => {
+	try {
+		const updatedProject = await ProjectModel.findByIdAndUpdate(
+			projectId,
+			project,
+			{
+				new: true,
+			}
+		);
+		if (!updatedProject) {
+			return Promise.reject(null);
+		}
+		return updatedProject;
+	} catch (err) {
+		return Promise.reject(null);
+	}
+};
 
-export const deleteProject = async () => {};
+export const deleteProject = async (
+	userId: string,
+	projectId: string
+): Promise<Partial<IProject>> => {
+	try {
+		const isProjectIdDeleted = await userService.deleteProject(
+			userId,
+			projectId
+		);
+		if (!isProjectIdDeleted) {
+			return Promise.reject(null);
+		}
+
+		//TODO delete column documents.
+		const deletedProject = await ProjectModel.findByIdAndDelete(projectId);
+		if (!deletedProject) {
+			return Promise.reject(null);
+		}
+		return deletedProject;
+	} catch (err) {
+		return Promise.reject(err);
+	}
+};
 
 export const addUser = async (
 	userId: string,

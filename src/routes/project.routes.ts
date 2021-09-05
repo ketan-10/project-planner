@@ -10,10 +10,20 @@ router.use(auth.isLoggedIn);
 
 router.post(
 	"/",
-	validator.validateProjectNameDescription,
+	validator.validateProjectNamePresent,
+	validator.validateProjectNameAndDescription,
 	projectController.addProject
 );
+
 router.get("/", projectController.getAllProjects);
 router.get("/:projectId", projectController.openProject);
+
+router.patch(
+	"/:projectId",
+	validator.validateProjectNameAndDescription,
+	projectController.updateProject
+);
+
+router.delete("/:projectId", projectController.deleteProject);
 
 export default router;

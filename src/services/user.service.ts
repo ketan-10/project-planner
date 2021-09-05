@@ -1,6 +1,8 @@
 import bcrypt from "bcryptjs";
+import { Types } from "mongoose";
 
 import UserModel, { IUser } from "../models/User";
+import log from "../util/logger";
 
 export const saveUser = async (
 	username: string,
@@ -40,13 +42,28 @@ export const addProjectToUser = async (
 		},
 		{
 			new: true,
-			upsert: true,
 		}
 	);
 	return updatedUser ? true : false;
 };
 
-export const deleteProject = async () => {};
+export const deleteProject = async (
+	userId: string,
+	projectId: string
+): Promise<boolean> => {
+	const updatedUser = await UserModel.findByIdAndUpdate(
+		userId,
+		{
+			$pull: {
+				projectIds: new Types.ObjectId(projectId),
+			},
+		},
+		{
+			new: true,
+		}
+	);
+	return updatedUser ? true : false;
+};
 
 export const getProjectIds = async (userId: string): Promise<Array<string>> => {
 	const user = await UserModel.findById(userId);
