@@ -79,7 +79,7 @@ export const openProject = async (req: Request, res: Response) => {
 		req.session.projectId = project._id; //opened a project
 		return res.status(200).json({
 			status: 200,
-			data: project,
+			data: lodash.omit(project.toJSON(), ["__v", "userIds"]),
 		});
 	} catch (err) {
 		if (!err) {
