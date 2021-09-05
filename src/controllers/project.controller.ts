@@ -116,7 +116,7 @@ export const deleteProject = async (req: Request, res: Response) => {
 			req.session.userId!,
 			projectId
 		);
-		if (req.session.projectId && req.session.projectId === projectId) {
+		if (req.session.projectId === projectId) {
 			req.session.projectId = null; //if project is open, close it.
 		}
 		return res.status(200).json({
