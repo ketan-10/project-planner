@@ -26,3 +26,32 @@ export const comparePassword = async (
 	const isValid = await bcrypt.compare(password, user.password);
 	return isValid ? user._id : null;
 };
+
+export const addProjectToUser = async (
+	userId: string,
+	projectId: string
+): Promise<boolean> => {
+	const updatedUser = await UserModel.findByIdAndUpdate(
+		userId,
+		{
+			$push: {
+				projectIds: projectId,
+			},
+		},
+		{
+			new: true,
+			upsert: true,
+		}
+	);
+	return updatedUser ? true : false;
+};
+
+export const deleteProject = async () => {};
+
+export const getProjectIds = async (userId: string): Promise<Array<string>> => {
+	const user = await UserModel.findById(userId);
+	if (!user) {
+		return Promise.reject(null);
+	}
+	return user?.projectIds;
+};

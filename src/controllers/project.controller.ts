@@ -1,7 +1,9 @@
 //TODO add, rename,get all projects, delete project, move column from x-> y
 //TODO validation & error handling
 
-import { Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
+import lodash from "lodash";
+
 import * as projectService from "../services/project.service";
 
 /**
@@ -25,24 +27,23 @@ import * as projectService from "../services/project.service";
  *
  */
 
-export const createProject = async (req: Request, res: Response) => {
-	const { projectName, description } = req.body;
-	const savedProject = await projectService.createProject({
-		projectName,
-		description,
-	});
-	return res.status(201).json(savedProject);
-};
-
-export const updateProjectName = async (req: Request, res: Response) => {
-	const { id } = req.params;
-	const { projectName } = req.body;
-	const updatedProject = await projectService.updateName(id, projectName);
-	return res.status(200).json(updatedProject);
-};
-
-export const deleteProject = async (req: Request, res: Response) => {
-	const { id } = req.params;
-	const deletedProject = await projectService.deleteProject(id);
-	return res.status(200).json(deletedProject);
+export const addProject = async (req: Request, res: Response) => {
+	try {
+		const projectId = await projectService.createProject(
+			lodash.pick(req.body, ["projectName", "projectDescription"]),
+			req.session.userId!
+		);
+		if (projectId) {
+			return res.status(200).json({
+				success: true,
+				data: {
+					projectId,
+				},
+			});
+		} else {
+			return res.sendStatus(500);
+		}
+	} catch (err) {
+		return res.sendStatus(500);
+	}
 };

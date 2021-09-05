@@ -1,11 +1,13 @@
 import { Router } from "express";
 
 import * as projectController from "../controllers/project.controller";
+import * as validator from "../middlewares/validator";
+import * as auth from "../middlewares/auth";
 
 const router = Router();
 
-router.post("/", projectController.createProject);
-router.patch("/:id", projectController.updateProjectName);
-router.delete("/:id", projectController.deleteProject);
+router.use(auth.isLoggedIn);
+
+router.post("/", validator.validateProjectName, projectController.addProject);
 
 export default router;

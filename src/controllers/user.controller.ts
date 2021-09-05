@@ -40,3 +40,19 @@ export const login = async (req: Request, res: Response) => {
 		errors: ["invalid credentials"],
 	});
 };
+
+export const logout = async (req: Request, res: Response) => {
+	try {
+		req.session.destroy((err) => {
+			if (err) {
+				return res.sendStatus(500);
+			}
+			return res.status(200).json({
+				success: true,
+				message: "logged out successfully!",
+			});
+		});
+	} catch (err) {
+		return res.sendStatus(500);
+	}
+};
