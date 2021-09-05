@@ -29,7 +29,7 @@ export const comparePassword = async (
 	return isValid ? user._id : null;
 };
 
-export const addProjectToUser = async (
+export const addProjectIdToUser = async (
 	userId: string,
 	projectId: string
 ): Promise<boolean> => {

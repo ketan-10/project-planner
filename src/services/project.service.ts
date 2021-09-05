@@ -42,7 +42,7 @@ export const createProject = async (
 			...project,
 			userIds: [userId],
 		});
-		await userService.addProjectToUser(userId, savedProject._id);
+		await userService.addProjectIdToUser(userId, savedProject._id);
 		return savedProject._id;
 	} catch (err) {
 		return Promise.reject("error in creating project");
