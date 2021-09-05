@@ -75,7 +75,7 @@ export const deleteProject = async (
 	projectId: string
 ): Promise<Partial<IProject>> => {
 	try {
-		const isProjectIdDeleted = await userService.deleteProject(
+		const isProjectIdDeleted = await userService.deleteProjectId(
 			userId,
 			projectId
 		);

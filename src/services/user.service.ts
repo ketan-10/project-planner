@@ -47,7 +47,7 @@ export const addProjectToUser = async (
 	return updatedUser ? true : false;
 };
 
-export const deleteProject = async (
+export const deleteProjectId = async (
 	userId: string,
 	projectId: string
 ): Promise<boolean> => {
