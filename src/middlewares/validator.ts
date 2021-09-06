@@ -104,3 +104,28 @@ export const validateProjectId = async (
 	}
 	return next();
 };
+
+export const validateColumnName = async (
+	req: Request,
+	res: Response,
+	next: NextFunction
+) => {
+	try {
+		await body("columnName")
+			.notEmpty()
+			.withMessage("columnName must be present")
+			.isLength({ max: 20 })
+			.withMessage("column name must be max 20 characters long")
+			.run(req);
+		const validatonErrors = validationResult(req);
+		if (validatonErrors && !validatonErrors.isEmpty()) {
+			return res.status(400).json({
+				success: false,
+				errors: validatonErrors["errors"],
+			});
+		}
+	} catch (err) {
+		return res.sendStatus(400);
+	}
+	return next();
+};

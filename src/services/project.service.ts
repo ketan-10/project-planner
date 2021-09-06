@@ -4,7 +4,7 @@ import log from "../util/logger";
 
 export const getUserProjects = async (
 	userId: string
-): Promise<Array<Partial<IProject>>> => {
+): Promise<Array<IProject>> => {
 	try {
 		const projectIds = await userService.getProjectIds(userId);
 		const projects = await ProjectModel.find(
@@ -27,7 +27,10 @@ export const getUserProjects = async (
 export const getOneProject = async (projectId: string): Promise<IProject> => {
 	try {
 		const project = await ProjectModel.findById(projectId);
-		return project!;
+		if (!project) {
+			return Promise.reject(null);
+		}
+		return project;
 	} catch (err) {
 		return Promise.reject(null);
 	}
@@ -52,7 +55,7 @@ export const createProject = async (
 export const updateProject = async (
 	projectId: string,
 	project: Partial<IProject>
-): Promise<Partial<IProject>> => {
+): Promise<IProject> => {
 	try {
 		const updatedProject = await ProjectModel.findByIdAndUpdate(
 			projectId,
@@ -73,7 +76,7 @@ export const updateProject = async (
 export const deleteProject = async (
 	userId: string,
 	projectId: string
-): Promise<Partial<IProject>> => {
+): Promise<IProject> => {
 	try {
 		const isProjectIdDeleted = await userService.deleteProjectId(
 			userId,
@@ -114,7 +117,29 @@ export const addUser = async (
 
 export const removeUser = async () => {};
 
-export const addColumn = async () => {};
+export const addColumnIdToProject = async (
+	projectId: string,
+	columnId: string
+): Promise<boolean> => {
+	try {
+		const updatedProject = await ProjectModel.findByIdAndUpdate(
+			projectId,
+			{
+				$push: {
+					columnIds: columnId,
+				},
+			},
+			{
+				new: true,
+			}
+		);
+		return updatedProject?.columnIds.includes(columnId)
+			? Promise.resolve(true)
+			: Promise.reject(false);
+	} catch (err) {
+		return Promise.reject(false);
+	}
+};
 
 export const deleteColumn = async () => {};
 

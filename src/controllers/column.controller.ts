@@ -23,3 +23,23 @@
  * move(xid <-> yid)
  *
  */
+
+import { Request, Response } from "express";
+
+import * as columnService from "../services/column.service";
+
+export const createColumn = async (req: Request, res: Response) => {
+	try {
+		const { columnName } = req.body;
+		const column = await columnService.createColumn(
+			req.session.projectId!,
+			columnName
+		);
+		return res.status(200).json({
+			success: true,
+			data: column,
+		});
+	} catch (err) {
+		return res.sendStatus(500);
+	}
+};

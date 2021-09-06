@@ -121,7 +121,11 @@ export const deleteProject = async (req: Request, res: Response) => {
 		}
 		return res.status(200).json({
 			success: true,
-			data: result,
+			data: lodash.pick(result.toJSON(), [
+				"_id",
+				"projectName",
+				"description",
+			]),
 		});
 	} catch (err) {
 		if (!err) {

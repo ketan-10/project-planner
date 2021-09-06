@@ -26,43 +26,56 @@ export const comparePassword = async (
 		return Promise.reject(null);
 	}
 	const isValid = await bcrypt.compare(password, user.password);
-	return isValid ? user._id : null;
+	return isValid ? Promise.resolve(user._id) : Promise.reject(null);
 };
 
 export const addProjectIdToUser = async (
 	userId: string,
 	projectId: string
 ): Promise<boolean> => {
-	const updatedUser = await UserModel.findByIdAndUpdate(
-		userId,
-		{
-			$push: {
-				projectIds: projectId,
+	try {
+		const updatedUser = await UserModel.findByIdAndUpdate(
+			userId,
+			{
+				$push: {
+					projectIds: projectId,
+				},
 			},
-		},
-		{
-			new: true,
-		}
-	);
-	return updatedUser ? true : false;
+			{
+				new: true,
+			}
+		);
+		return updatedUser?.projectIds.includes(projectId)
+			? Promise.resolve(true)
+			: Promise.reject(false);
+	} catch (err) {
+		return Promise.reject(false);
+	}
 };
 
 export const deleteProjectId = async (
 	userId: string,
 	projectId: string
 ): Promise<boolean> => {
-	const updatedUser = await UserModel.findByIdAndUpdate(
-		userId,
-		{
-			$pull: {
-				projectIds: new Types.ObjectId(projectId),
+	try {
+		const updatedUser = await UserModel.findByIdAndUpdate(
+			userId,
+			{
+				$pull: {
+					projectIds: new Types.ObjectId(projectId),
+				},
 			},
-		},
-		{
-			new: true,
-		}
-	);
-	return updatedUser ? true : false;
+			{
+				new: true,
+			}
+		);
+		if (!updatedUser) return Promise.reject(false);
+		return updatedUser.projectIds.includes(projectId)
+			? Promise.reject(false)
+			: Promise.resolve(true);
+	} catch (err) {
+		return Promise.reject(false);
+	}
 };
 
 export const getProjectIds = async (userId: string): Promise<Array<string>> => {
@@ -70,5 +83,5 @@ export const getProjectIds = async (userId: string): Promise<Array<string>> => {
 	if (!user) {
 		return Promise.reject(null);
 	}
-	return user?.projectIds;
+	return user.projectIds;
 };
