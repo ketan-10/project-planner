@@ -143,4 +143,27 @@ export const addColumnIdToProject = async (
 
 export const deleteColumn = async () => {};
 
-export const swapColumns = async () => {};
+export const swapColumns = async (
+	projectId: string,
+	fromIndex: number,
+	toIndex: number
+): Promise<Array<string>> => {
+	try {
+		const project = await ProjectModel.findById(projectId);
+		if (!project) return Promise.reject(null);
+		const columnIds = project.columnIds;
+		if (fromIndex < columnIds.length && toIndex < columnIds.length) {
+			const tmp = columnIds[fromIndex];
+			columnIds[fromIndex] = columnIds[toIndex];
+			columnIds[toIndex] = tmp;
+			await ProjectModel.findByIdAndUpdate(projectId, {
+				columnIds,
+			});
+			return columnIds;
+		} else {
+			return Promise.reject(null); //TODO handle diffrent types of errors.
+		}
+	} catch (err) {
+		return Promise.reject(err);
+	}
+};

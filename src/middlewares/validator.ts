@@ -129,3 +129,38 @@ export const validateColumnName = async (
 	}
 	return next();
 };
+
+export const validateColumnIndices = async (
+	req: Request,
+	res: Response,
+	next: NextFunction
+) => {
+	try {
+		await body("fromIndex")
+			.notEmpty()
+			.withMessage("fromIndex must be present")
+			.isNumeric()
+			.withMessage("fromIndex must be numeric")
+			.isFloat({ min: 0, max: 6 })
+			.withMessage("fromIndex must be between 0 and 6")
+			.run(req);
+		await body("toIndex")
+			.notEmpty()
+			.withMessage("toIndex must be present")
+			.isNumeric()
+			.withMessage("toIndex must be numeric")
+			.isFloat({ min: 0, max: 6 })
+			.withMessage("toIndex must be between 0 and 6")
+			.run(req);
+		const validatonErrors = validationResult(req);
+		if (validatonErrors && !validatonErrors.isEmpty()) {
+			return res.status(400).json({
+				success: false,
+				errors: validatonErrors["errors"],
+			});
+		}
+	} catch (err) {
+		return res.sendStatus(400);
+	}
+	return next();
+};

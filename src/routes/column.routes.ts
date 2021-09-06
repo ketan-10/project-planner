@@ -10,5 +10,16 @@ router.use(auth.isLoggedIn);
 router.use(auth.hasProjectOpened);
 
 router.post("/", validator.validateColumnName, columnController.createColumn);
+router.patch(
+	"/:columnId",
+	validator.validateColumnName,
+	columnController.updateColumn
+);
+
+router.post(
+	"/swap",
+	validator.validateColumnIndices,
+	columnController.swapColumns
+);
 
 export default router;
