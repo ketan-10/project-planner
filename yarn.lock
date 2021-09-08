@@ -86,6 +86,13 @@
     "@types/qs" "*"
     "@types/serve-static" "*"
 
+"@types/http-status@^1.1.2":
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/@types/http-status/-/http-status-1.1.2.tgz#1f4d34e2df526b62f23db98e93c862603fcef22a"
+  integrity sha512-GodZPvF3xPVglUx4q7s0plKu1cdW0mMLADpWi5PMMx3n/2xGB6GoKqQxQxp6A5xuARtZpQ9/6p3WDFwCpPaN8A==
+  dependencies:
+    http-status "*"
+
 "@types/ioredis@*":
   version "4.27.1"
   resolved "https://registry.yarnpkg.com/@types/ioredis/-/ioredis-4.27.1.tgz#f1c2d8a4341ed5ff9f4dd7aebfb38e275e3b3197"
@@ -648,6 +655,11 @@ http-errors@~1.7.2:
     setprototypeof "1.1.1"
     statuses ">= 1.5.0 < 2"
     toidentifier "1.0.0"
+
+http-status@*, http-status@^1.5.0:
+  version "1.5.0"
+  resolved "https://registry.yarnpkg.com/http-status/-/http-status-1.5.0.tgz#2edfb02068d236ba60fd1481ad89219aa96e1677"
+  integrity sha512-wcGvY31MpFNHIkUcXHHnvrE4IKYlpvitJw5P/1u892gMBAM46muQ+RH7UN1d+Ntnfx5apnOnVY6vcLmrWHOLwg==
 
 iconv-lite@0.4.24:
   version "0.4.24"

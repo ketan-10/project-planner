@@ -1,6 +1,11 @@
-declare namespace Express {
-	export interface Request {
-		userId: string;
-		projectId: string;
+import { IUser } from "../models/User";
+
+declare global {
+	namespace Express {
+		export interface Request {
+			user: IUser;
+			userId: string;
+			projectId: string;
+		}
 	}
 }

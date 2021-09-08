@@ -1,3 +1,4 @@
+import { BaseError } from "../errors/base.error";
 import ColumnModel, { IColumn } from "../models/Column";
 import * as projectService from "../services/project.service";
 
@@ -10,7 +11,8 @@ export const createColumn = async (
 		await projectService.addColumnIdToProject(projectId, savedColumn._id);
 		return savedColumn;
 	} catch (err) {
-		return Promise.reject(err);
+		if (err instanceof BaseError) return Promise.reject(err);
+		return Promise.reject(new BaseError({ statusCode: 500 }));
 	}
 };
 
@@ -29,10 +31,15 @@ export const updateColumn = async (
 			}
 		);
 		if (!updatedColumn) {
-			return Promise.reject(null);
+			return Promise.reject(
+				new BaseError({
+					statusCode: 404,
+					description: `columnId ${columnId} not found`,
+				})
+			);
 		}
 		return updatedColumn;
 	} catch (err) {
-		return Promise.reject(err);
+		return Promise.reject(new BaseError({ statusCode: 500 }));
 	}
 };

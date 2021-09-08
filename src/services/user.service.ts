@@ -1,5 +1,6 @@
 import bcrypt from "bcryptjs";
 import { Types } from "mongoose";
+import { BaseError } from "../errors/base.error";
 
 import UserModel, { IUser } from "../models/User";
 import log from "../util/logger";
@@ -8,25 +9,49 @@ export const saveUser = async (
 	username: string,
 	password: string
 ): Promise<IUser> => {
-	const savedUser = await UserModel.create({
-		username,
-		password: await bcrypt.hash(password, 14),
-	});
-	return savedUser;
+	try {
+		const savedUser = await UserModel.create({
+			username,
+			password: await bcrypt.hash(password, 14),
+		});
+		return savedUser;
+	} catch (error: any) {
+		if (error.code === 11000) {
+			//unique key error code
+			return Promise.reject(
+				new BaseError({
+					statusCode: 400,
+					description: "duplicate username",
+				})
+			);
+		}
+		return Promise.reject(new BaseError({ statusCode: 500 }));
+	}
 };
 
 export const comparePassword = async (
 	username: string,
 	password: string
 ): Promise<string> => {
-	const user = await UserModel.findOne({
-		username: username,
-	});
-	if (!user) {
-		return Promise.reject(null);
+	try {
+		const user = await UserModel.findOne({
+			username: username,
+		});
+		if (!user) {
+			return Promise.reject(new BaseError({ statusCode: 404 }));
+		}
+		const isValid = await bcrypt.compare(password, user?.password);
+		return isValid
+			? Promise.resolve(user._id)
+			: Promise.reject(
+					new BaseError({
+						statusCode: 401,
+						description: "Incorrect credentials",
+					})
+			  );
+	} catch (error) {
+		return Promise.reject(new BaseError({ statusCode: 500 }));
 	}
-	const isValid = await bcrypt.compare(password, user.password);
-	return isValid ? Promise.resolve(user._id) : Promise.reject(null);
 };
 
 export const addProjectIdToUser = async (
@@ -45,11 +70,14 @@ export const addProjectIdToUser = async (
 				new: true,
 			}
 		);
+		if (!updatedUser) {
+			return Promise.reject(new BaseError({ statusCode: 404 }));
+		}
 		return updatedUser?.projectIds.includes(projectId)
 			? Promise.resolve(true)
 			: Promise.reject(false);
 	} catch (err) {
-		return Promise.reject(false);
+		return Promise.reject(new BaseError({ statusCode: 500 }));
 	}
 };
 
@@ -69,12 +97,13 @@ export const deleteProjectId = async (
 				new: true,
 			}
 		);
-		if (!updatedUser) return Promise.reject(false);
+		if (!updatedUser)
+			return Promise.reject(new BaseError({ statusCode: 404 }));
 		return updatedUser.projectIds.includes(projectId)
 			? Promise.reject(false)
 			: Promise.resolve(true);
 	} catch (err) {
-		return Promise.reject(false);
+		return Promise.reject(new BaseError({ statusCode: 500 }));
 	}
 };
 

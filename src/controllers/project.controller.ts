@@ -3,6 +3,7 @@
 
 import { Request, Response, NextFunction } from "express";
 import lodash from "lodash";
+import { BaseError } from "../errors/base.error";
 
 import * as projectService from "../services/project.service";
 import log from "../util/logger";
@@ -34,17 +35,19 @@ export const addProject = async (req: Request, res: Response) => {
 			lodash.pick(req.body, ["projectName", "description"]),
 			req.session.userId!
 		);
-		if (projectId) {
-			return res.status(200).json({
-				success: true,
-				data: {
-					projectId,
-				},
-			});
-		} else {
-			return res.sendStatus(500);
-		}
+		return res.status(200).json({
+			success: true,
+			data: {
+				projectId,
+			},
+		});
 	} catch (err) {
+		if (err instanceof BaseError) {
+			return res.status(err.statusCode).json({
+				success: false,
+				message: err.description,
+			});
+		}
 		return res.sendStatus(500);
 	}
 };
@@ -57,17 +60,19 @@ export const getAllProjects = async (req: Request, res: Response) => {
 		const projects = await projectService.getUserProjects(
 			req.session.userId!
 		);
-		if (projects) {
-			return res.status(200).json({
-				success: true,
-				data: {
-					projects,
-				},
-			});
-		} else {
-			return res.sendStatus(500);
-		}
+		return res.status(200).json({
+			success: true,
+			data: {
+				projects,
+			},
+		});
 	} catch (err) {
+		if (err instanceof BaseError) {
+			return res.status(err.statusCode).json({
+				success: false,
+				message: err.description,
+			});
+		}
 		return res.sendStatus(500);
 	}
 };
@@ -82,8 +87,11 @@ export const openProject = async (req: Request, res: Response) => {
 			data: lodash.omit(project.toJSON(), ["__v", "userIds"]),
 		});
 	} catch (err) {
-		if (!err) {
-			return res.sendStatus(404);
+		if (err instanceof BaseError) {
+			return res.status(err.statusCode).json({
+				success: false,
+				message: err.description,
+			});
 		}
 		return res.sendStatus(500);
 	}
@@ -102,8 +110,11 @@ export const updateProject = async (req: Request, res: Response) => {
 			data: lodash.pick(updatedProject, ["projectName", "description"]),
 		});
 	} catch (err) {
-		if (!err) {
-			return res.sendStatus(404);
+		if (err instanceof BaseError) {
+			return res.status(err.statusCode).json({
+				success: false,
+				message: err.description,
+			});
 		}
 		return res.sendStatus(500);
 	}
@@ -128,8 +139,11 @@ export const deleteProject = async (req: Request, res: Response) => {
 			]),
 		});
 	} catch (err) {
-		if (!err) {
-			return res.sendStatus(404);
+		if (err instanceof BaseError) {
+			return res.status(err.statusCode).json({
+				success: false,
+				message: err.description,
+			});
 		}
 		return res.sendStatus(500);
 	}

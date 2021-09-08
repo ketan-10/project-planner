@@ -136,21 +136,21 @@ export const validateColumnIndices = async (
 	next: NextFunction
 ) => {
 	try {
-		await body("fromIndex")
+		await body("firstIndex")
 			.notEmpty()
-			.withMessage("fromIndex must be present")
+			.withMessage("firstIndex must be present")
 			.isNumeric()
-			.withMessage("fromIndex must be numeric")
+			.withMessage("firstIndex must be numeric")
 			.isFloat({ min: 0, max: 6 })
-			.withMessage("fromIndex must be between 0 and 6")
+			.withMessage("firstIndex must be between 0 and 6")
 			.run(req);
-		await body("toIndex")
+		await body("secondIndex")
 			.notEmpty()
-			.withMessage("toIndex must be present")
+			.withMessage("secondIndex must be present")
 			.isNumeric()
-			.withMessage("toIndex must be numeric")
+			.withMessage("secondIndex must be numeric")
 			.isFloat({ min: 0, max: 6 })
-			.withMessage("toIndex must be between 0 and 6")
+			.withMessage("secondIndex must be between 0 and 6")
 			.run(req);
 		const validatonErrors = validationResult(req);
 		if (validatonErrors && !validatonErrors.isEmpty()) {

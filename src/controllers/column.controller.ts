@@ -26,6 +26,7 @@
 
 import { Request, Response } from "express";
 import lodash from "lodash";
+import { BaseError } from "../errors/base.error";
 
 import * as columnService from "../services/column.service";
 import * as projectService from "../services/project.service";
@@ -43,6 +44,12 @@ export const createColumn = async (req: Request, res: Response) => {
 			data: column,
 		});
 	} catch (err) {
+		if (err instanceof BaseError) {
+			return res.status(err.statusCode).json({
+				success: false,
+				message: err.description,
+			});
+		}
 		return res.sendStatus(500);
 	}
 };
@@ -60,18 +67,23 @@ export const updateColumn = async (req: Request, res: Response) => {
 			data: lodash.pick(updatedColumn.toJSON(), ["columnName"]),
 		});
 	} catch (err) {
-		if (!err) return res.sendStatus(404);
+		if (err instanceof BaseError) {
+			return res.status(err.statusCode).json({
+				success: false,
+				message: err.description,
+			});
+		}
 		return res.sendStatus(500);
 	}
 };
 
 export const swapColumns = async (req: Request, res: Response) => {
 	try {
-		const { fromIndex, toIndex } = req.body;
+		const { firstIndex, secondIndex } = req.body;
 		const columnIds = await projectService.swapColumns(
 			req.session.projectId!,
-			fromIndex,
-			toIndex
+			firstIndex,
+			secondIndex
 		);
 		return res.status(200).json({
 			success: true,
@@ -80,6 +92,12 @@ export const swapColumns = async (req: Request, res: Response) => {
 			},
 		});
 	} catch (err) {
+		if (err instanceof BaseError) {
+			return res.status(err.statusCode).json({
+				success: false,
+				message: err.description,
+			});
+		}
 		return res.sendStatus(500);
 	}
 };

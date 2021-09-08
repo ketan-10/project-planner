@@ -1,3 +1,4 @@
+import { BaseError } from "../errors/base.error";
 import ProjectModel, { IProject } from "../models/Project";
 import * as userService from "../services/user.service";
 import log from "../util/logger";
@@ -7,6 +8,14 @@ export const getUserProjects = async (
 ): Promise<Array<IProject>> => {
 	try {
 		const projectIds = await userService.getProjectIds(userId);
+		if (!projectIds) {
+			return Promise.reject(
+				new BaseError({
+					statusCode: 404,
+					description: "userId not found",
+				})
+			);
+		}
 		const projects = await ProjectModel.find(
 			{
 				_id: {
@@ -18,9 +27,10 @@ export const getUserProjects = async (
 				projectDescription: 1,
 			}
 		);
-		return projects;
+		return Promise.resolve(projects);
 	} catch (err) {
-		return Promise.reject(null);
+		if (err instanceof BaseError) return Promise.reject(err);
+		return Promise.reject(new BaseError({ statusCode: 500 }));
 	}
 };
 
@@ -28,16 +38,21 @@ export const getOneProject = async (projectId: string): Promise<IProject> => {
 	try {
 		const project = await ProjectModel.findById(projectId);
 		if (!project) {
-			return Promise.reject(null);
+			return Promise.reject(
+				new BaseError({
+					statusCode: 404,
+					description: `projectId ${projectId} not found`,
+				})
+			);
 		}
-		return project;
+		return Promise.resolve(project);
 	} catch (err) {
-		return Promise.reject(null);
+		return Promise.reject(new BaseError({ statusCode: 500 }));
 	}
 };
 
 export const createProject = async (
-	project: object,
+	project: Partial<IProject>,
 	userId: string
 ): Promise<string> => {
 	try {
@@ -48,7 +63,9 @@ export const createProject = async (
 		await userService.addProjectIdToUser(userId, savedProject._id);
 		return savedProject._id;
 	} catch (err) {
-		return Promise.reject("error in creating project");
+		if (err instanceof BaseError) return Promise.reject(err);
+		//TODO add rollback if userService fails
+		return Promise.reject(new BaseError({ statusCode: 500 }));
 	}
 };
 
@@ -65,11 +82,20 @@ export const updateProject = async (
 			}
 		);
 		if (!updatedProject) {
-			return Promise.reject(null);
+			return Promise.reject(
+				new BaseError({
+					statusCode: 404,
+					description: `projectId ${projectId} not found`,
+				})
+			);
 		}
 		return updatedProject;
 	} catch (err) {
-		return Promise.reject(null);
+		return Promise.reject(
+			new BaseError({
+				statusCode: 500,
+			})
+		);
 	}
 };
 
@@ -78,22 +104,21 @@ export const deleteProject = async (
 	projectId: string
 ): Promise<IProject> => {
 	try {
-		const isProjectIdDeleted = await userService.deleteProjectId(
-			userId,
-			projectId
-		);
-		if (!isProjectIdDeleted) {
-			return Promise.reject(null);
-		}
-
+		await userService.deleteProjectId(userId, projectId);
 		//TODO delete column documents.
 		const deletedProject = await ProjectModel.findByIdAndDelete(projectId);
 		if (!deletedProject) {
-			return Promise.reject(null);
+			return Promise.reject(
+				new BaseError({
+					statusCode: 404,
+					description: `projectId ${projectId} not found`,
+				})
+			);
 		}
 		return deletedProject;
 	} catch (err) {
-		return Promise.reject(err);
+		if (err instanceof BaseError) return Promise.reject(err);
+		return Promise.reject(new BaseError({ statusCode: 500 }));
 	}
 };
 
@@ -101,18 +126,30 @@ export const addUser = async (
 	userId: string,
 	projectId: string
 ): Promise<boolean> => {
-	const updatedProject = await ProjectModel.findByIdAndUpdate(
-		projectId,
-		{
-			$push: {
-				userIds: userId,
+	try {
+		const updatedProject = await ProjectModel.findByIdAndUpdate(
+			projectId,
+			{
+				$push: {
+					userIds: userId,
+				},
 			},
-		},
-		{
-			new: true,
+			{
+				new: true,
+			}
+		);
+		if (!updatedProject) {
+			return Promise.reject(
+				new BaseError({
+					statusCode: 404,
+					description: `projectId ${projectId} not found`,
+				})
+			);
 		}
-	);
-	return updatedProject ? true : false;
+		return true;
+	} catch (error) {
+		return Promise.reject(new BaseError({ statusCode: 500 }));
+	}
 };
 
 export const removeUser = async () => {};
@@ -133,11 +170,19 @@ export const addColumnIdToProject = async (
 				new: true,
 			}
 		);
+		if (!updatedProject) {
+			return Promise.reject(
+				new BaseError({
+					statusCode: 404,
+					description: `projectId ${projectId} not found`,
+				})
+			);
+		}
 		return updatedProject?.columnIds.includes(columnId)
 			? Promise.resolve(true)
 			: Promise.reject(false);
 	} catch (err) {
-		return Promise.reject(false);
+		return Promise.reject(new BaseError({ statusCode: 500 }));
 	}
 };
 
@@ -145,25 +190,39 @@ export const deleteColumn = async () => {};
 
 export const swapColumns = async (
 	projectId: string,
-	fromIndex: number,
-	toIndex: number
+	firstIndex: number,
+	secondIndex: number
 ): Promise<Array<string>> => {
 	try {
 		const project = await ProjectModel.findById(projectId);
-		if (!project) return Promise.reject(null);
+		if (!project) {
+			return Promise.reject(
+				new BaseError({
+					statusCode: 404,
+					description: `projectId ${projectId} not found`,
+				})
+			);
+		}
 		const columnIds = project.columnIds;
-		if (fromIndex < columnIds.length && toIndex < columnIds.length) {
-			const tmp = columnIds[fromIndex];
-			columnIds[fromIndex] = columnIds[toIndex];
-			columnIds[toIndex] = tmp;
+		if (firstIndex < columnIds.length && secondIndex < columnIds.length) {
+			const tmp = columnIds[firstIndex];
+			columnIds[firstIndex] = columnIds[secondIndex];
+			columnIds[secondIndex] = tmp;
 			await ProjectModel.findByIdAndUpdate(projectId, {
 				columnIds,
 			});
 			return columnIds;
 		} else {
-			return Promise.reject(null); //TODO handle diffrent types of errors.
+			return Promise.reject(
+				new BaseError({
+					statusCode: 400,
+					description:
+						"first, and second indices must be less than number of columns",
+				})
+			);
 		}
 	} catch (err) {
-		return Promise.reject(err);
+		if (err instanceof BaseError) return Promise.reject(err);
+		return Promise.reject(new BaseError({ statusCode: 500 }));
 	}
 };
