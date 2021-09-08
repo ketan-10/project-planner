@@ -16,7 +16,7 @@ router.patch(
 	columnController.updateColumn
 );
 
-router.post(
+router.patch(
 	"/swap",
 	validator.validateColumnIndices,
 	columnController.swapColumns

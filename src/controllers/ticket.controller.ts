@@ -7,6 +7,8 @@ import { Request, Response } from "express";
 
 import { BaseError } from "../errors/base.error";
 import * as ticketService from "../services/ticket.service";
+import { swapTicketsInSameColumn } from "../services/column.service";
+import log from "../util/logger";
 
 export const createTicket = async (req: Request, res: Response) => {
 	try {
@@ -53,4 +55,25 @@ export const updateTicket = async (req: Request, res: Response) => {
 	}
 };
 
-export const swapTickets = async (req: Request, res: Response) => {};
+export const swapTickets = async (req: Request, res: Response) => {
+	try {
+		const { columnId, firstIndex, secondIndex } = req.body;
+		const updatedTicketIds = await swapTicketsInSameColumn(
+			columnId,
+			firstIndex,
+			secondIndex
+		);
+		return res.status(200).json({
+			success: true,
+			data: updatedTicketIds,
+		});
+	} catch (error) {
+		if (error instanceof BaseError) {
+			return res.status(error.statusCode).json({
+				success: false,
+				message: error.description,
+			});
+		}
+		return res.sendStatus(500);
+	}
+};

@@ -205,9 +205,10 @@ export const swapColumns = async (
 		}
 		const columnIds = project.columnIds;
 		if (firstIndex < columnIds.length && secondIndex < columnIds.length) {
-			const tmp = columnIds[firstIndex];
-			columnIds[firstIndex] = columnIds[secondIndex];
-			columnIds[secondIndex] = tmp;
+			[columnIds[firstIndex], columnIds[secondIndex]] = [
+				columnIds[secondIndex],
+				columnIds[firstIndex],
+			];
 			await ProjectModel.findByIdAndUpdate(projectId, {
 				columnIds,
 			});

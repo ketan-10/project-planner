@@ -74,7 +74,7 @@ export const addTicketIdToColumn = async (
 	}
 };
 
-export const swapTickets = async (
+export const swapTicketsInSameColumn = async (
 	columnId: string,
 	firstIndex: number,
 	secondIndex: number
@@ -91,9 +91,10 @@ export const swapTickets = async (
 		}
 		const ticketIds = column.ticketIds;
 		if (firstIndex < ticketIds.length && secondIndex < ticketIds.length) {
-			const tmp = ticketIds[firstIndex];
-			ticketIds[firstIndex] = ticketIds[secondIndex];
-			ticketIds[secondIndex] = tmp;
+			[ticketIds[firstIndex], ticketIds[secondIndex]] = [
+				ticketIds[secondIndex],
+				ticketIds[firstIndex],
+			];
 			await ColumnModel.findByIdAndUpdate(columnId, {
 				ticketIds,
 			});
