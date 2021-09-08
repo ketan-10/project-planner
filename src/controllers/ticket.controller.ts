@@ -7,10 +7,7 @@ import { Request, Response } from "express";
 
 import { BaseError } from "../errors/base.error";
 import * as ticketService from "../services/ticket.service";
-import {
-	moveticketAcrossColumns,
-	swapTicketsInSameColumn,
-} from "../services/column.service";
+import * as columnService from "../services/column.service";
 import log from "../util/logger";
 
 export const createTicket = async (req: Request, res: Response) => {
@@ -22,7 +19,7 @@ export const createTicket = async (req: Request, res: Response) => {
 		});
 		return res.status(200).json({
 			success: true,
-			data: ticketId,
+			data: { ticketId },
 		});
 	} catch (error) {
 		if (error instanceof BaseError) {
@@ -61,14 +58,16 @@ export const updateTicket = async (req: Request, res: Response) => {
 export const swapTickets = async (req: Request, res: Response) => {
 	try {
 		const { columnId, firstIndex, secondIndex } = req.body;
-		const updatedTicketIds = await swapTicketsInSameColumn(
+		const updatedTicketIds = await columnService.swapTicketsInSameColumn(
 			columnId,
 			firstIndex,
 			secondIndex
 		);
 		return res.status(200).json({
 			success: true,
-			data: updatedTicketIds,
+			data: {
+				updatedTicketIds,
+			},
 		});
 	} catch (error) {
 		if (error instanceof BaseError) {
@@ -84,16 +83,15 @@ export const swapTickets = async (req: Request, res: Response) => {
 export const moveTicketAcrossColumns = async (req: Request, res: Response) => {
 	try {
 		const { ticketId } = req.params;
-		const { columnFromId, columnToId, ticketIndex } = req.body;
-		await moveticketAcrossColumns(
-			columnFromId,
-			columnToId,
+		const { targetColumnId, ticketIndex } = req.body;
+		await columnService.moveticketAcrossColumns(
+			targetColumnId,
 			ticketIndex,
 			ticketId
 		);
 		return res.status(200).json({
 			success: true,
-			message: `ticketId ${ticketId} moved from column ${columnFromId} to ${columnToId} at index ${ticketIndex}`,
+			message: `ticketId ${ticketId} moved to column ${targetColumnId} at index ${ticketIndex}`,
 		});
 	} catch (error) {
 		if (error instanceof BaseError) {

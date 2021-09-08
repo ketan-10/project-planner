@@ -1,6 +1,8 @@
+import { Types } from "mongoose";
 import { BaseError } from "../errors/base.error";
 import ColumnModel, { IColumn } from "../models/Column";
 import * as projectService from "../services/project.service";
+import * as ticketService from "../services/ticket.service";
 import log from "../util/logger";
 
 export const createColumn = async (
@@ -135,12 +137,16 @@ export const swapTicketsInSameColumn = async (
 };
 
 export const moveticketAcrossColumns = async (
-	columnFromId: string,
-	columnToId: string,
+	targetColumnId: string,
 	ticketIndex: number,
 	ticketId: string
 ): Promise<boolean> => {
 	try {
+		const ticket = await ticketService.getTicketById(ticketId);
+		const [columnFromId, columnToId]: string[] = [
+			ticket.columnId.toString(),
+			targetColumnId,
+		];
 		const [columnFrom, columnTo]: IColumn[] = await Promise.all([
 			getColumnByColumnId(columnFromId),
 			getColumnByColumnId(columnToId),
@@ -189,7 +195,72 @@ export const moveticketAcrossColumns = async (
 				new: true,
 			}
 		);
-		await Promise.all([deleteFromColumn, updateToColumn]);
+
+		const updateColumnId = ticketService.updateColumnId(
+			ticketId,
+			columnToId
+		);
+
+		await Promise.all([deleteFromColumn, updateToColumn, updateColumnId]);
+		return true;
+	} catch (error) {
+		if (error instanceof BaseError) return Promise.reject(error);
+		return Promise.reject(new BaseError({ statusCode: 500 }));
+	}
+};
+
+export const deleteOneTicket = async (ticketId: string): Promise<boolean> => {
+	try {
+		const ticket = await ticketService.getTicketById(ticketId);
+		const updatedColumn = await ColumnModel.findByIdAndUpdate(
+			ticket.columnId.toString(),
+			{
+				$pull: {
+					ticketids: new Types.ObjectId(ticketId),
+				},
+			},
+			{ new: true }
+		);
+		if (!updatedColumn || updatedColumn.ticketIds.includes(ticketId)) {
+			return Promise.reject(
+				new BaseError({
+					statusCode: 404,
+					description: `columnId ${ticket.columnId.toString()} not found`,
+				})
+			);
+		}
+		await ticketService.deleteOneTicketById(ticketId);
+		return true;
+	} catch (error) {
+		if (error instanceof BaseError) return Promise.reject(error);
+		return Promise.reject(new BaseError({ statusCode: 500 }));
+	}
+};
+
+export const truncateColumnById = async (
+	columnId: string
+): Promise<boolean> => {
+	try {
+		const column = await ColumnModel.findByIdAndUpdate(
+			columnId,
+			{
+				ticketIds: [],
+			},
+			{
+				new: false,
+			}
+		);
+		if (!column) {
+			return Promise.reject(
+				new BaseError({
+					statusCode: 404,
+					description: `columnId ${columnId} not found`,
+				})
+			);
+		}
+		await ticketService.deleteManyTicketsByIds(
+			column.ticketIds as string[]
+		);
 		return true;
 	} catch (error) {
 		if (error instanceof BaseError) return Promise.reject(error);

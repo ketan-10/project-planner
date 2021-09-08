@@ -282,13 +282,9 @@ export const validateMoveAcross = async (
 	next: NextFunction
 ) => {
 	try {
-		await body("columnFromId")
+		await body("targetColumnId")
 			.notEmpty()
-			.withMessage("columnFromId should be present")
-			.run(req);
-		await body("columnToId")
-			.notEmpty()
-			.withMessage("columnToId should be present")
+			.withMessage("targetColumnId should be present")
 			.run(req);
 		await check("ticketId")
 			.notEmpty()
