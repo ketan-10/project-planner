@@ -28,8 +28,8 @@ export const getUserProjects = async (
 			}
 		);
 		return Promise.resolve(projects);
-	} catch (err) {
-		if (err instanceof BaseError) return Promise.reject(err);
+	} catch (error) {
+		if (error instanceof BaseError) return Promise.reject(error);
 		return Promise.reject(new BaseError({ statusCode: 500 }));
 	}
 };
@@ -46,7 +46,7 @@ export const getOneProject = async (projectId: string): Promise<IProject> => {
 			);
 		}
 		return Promise.resolve(project);
-	} catch (err) {
+	} catch (error) {
 		return Promise.reject(new BaseError({ statusCode: 500 }));
 	}
 };
@@ -62,8 +62,8 @@ export const createProject = async (
 		});
 		await userService.addProjectIdToUser(userId, savedProject._id);
 		return savedProject._id;
-	} catch (err) {
-		if (err instanceof BaseError) return Promise.reject(err);
+	} catch (error) {
+		if (error instanceof BaseError) return Promise.reject(error);
 		//TODO add rollback if userService fails
 		return Promise.reject(new BaseError({ statusCode: 500 }));
 	}
@@ -90,7 +90,7 @@ export const updateProject = async (
 			);
 		}
 		return updatedProject;
-	} catch (err) {
+	} catch (error) {
 		return Promise.reject(
 			new BaseError({
 				statusCode: 500,
@@ -116,8 +116,8 @@ export const deleteProject = async (
 			);
 		}
 		return deletedProject;
-	} catch (err) {
-		if (err instanceof BaseError) return Promise.reject(err);
+	} catch (error) {
+		if (error instanceof BaseError) return Promise.reject(error);
 		return Promise.reject(new BaseError({ statusCode: 500 }));
 	}
 };
@@ -181,7 +181,7 @@ export const addColumnIdToProject = async (
 		return updatedProject?.columnIds.includes(columnId)
 			? Promise.resolve(true)
 			: Promise.reject(false);
-	} catch (err) {
+	} catch (error) {
 		return Promise.reject(new BaseError({ statusCode: 500 }));
 	}
 };
@@ -222,8 +222,8 @@ export const swapColumns = async (
 				})
 			);
 		}
-	} catch (err) {
-		if (err instanceof BaseError) return Promise.reject(err);
+	} catch (error) {
+		if (error instanceof BaseError) return Promise.reject(error);
 		return Promise.reject(new BaseError({ statusCode: 500 }));
 	}
 };

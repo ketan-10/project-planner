@@ -76,7 +76,7 @@ export const addProjectIdToUser = async (
 		return updatedUser?.projectIds.includes(projectId)
 			? Promise.resolve(true)
 			: Promise.reject(false);
-	} catch (err) {
+	} catch (error) {
 		return Promise.reject(new BaseError({ statusCode: 500 }));
 	}
 };
@@ -102,7 +102,7 @@ export const deleteProjectId = async (
 		return updatedUser.projectIds.includes(projectId)
 			? Promise.reject(false)
 			: Promise.resolve(true);
-	} catch (err) {
+	} catch (error) {
 		return Promise.reject(new BaseError({ statusCode: 500 }));
 	}
 };

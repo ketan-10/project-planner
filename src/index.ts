@@ -62,7 +62,7 @@ app.use(
 mongoose
 	.connect(MONGO_URL)
 	.then((_result) => console.log("connected to mongoDB!"))
-	.catch((err) => console.log(err));
+	.catch((error) => console.log(error));
 
 app.use("/users", userRoutes);
 app.use("/projects", projectRoutes);

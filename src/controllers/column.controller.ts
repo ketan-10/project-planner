@@ -43,11 +43,11 @@ export const createColumn = async (req: Request, res: Response) => {
 			success: true,
 			data: column,
 		});
-	} catch (err) {
-		if (err instanceof BaseError) {
-			return res.status(err.statusCode).json({
+	} catch (error) {
+		if (error instanceof BaseError) {
+			return res.status(error.statusCode).json({
 				success: false,
-				message: err.description,
+				message: error.description,
 			});
 		}
 		return res.sendStatus(500);
@@ -66,11 +66,11 @@ export const updateColumn = async (req: Request, res: Response) => {
 			success: true,
 			data: lodash.pick(updatedColumn.toJSON(), ["columnName"]),
 		});
-	} catch (err) {
-		if (err instanceof BaseError) {
-			return res.status(err.statusCode).json({
+	} catch (error) {
+		if (error instanceof BaseError) {
+			return res.status(error.statusCode).json({
 				success: false,
-				message: err.description,
+				message: error.description,
 			});
 		}
 		return res.sendStatus(500);
@@ -91,11 +91,11 @@ export const swapColumns = async (req: Request, res: Response) => {
 				columnIds,
 			},
 		});
-	} catch (err) {
-		if (err instanceof BaseError) {
-			return res.status(err.statusCode).json({
+	} catch (error) {
+		if (error instanceof BaseError) {
+			return res.status(error.statusCode).json({
 				success: false,
-				message: err.description,
+				message: error.description,
 			});
 		}
 		return res.sendStatus(500);

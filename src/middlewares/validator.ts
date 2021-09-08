@@ -28,7 +28,7 @@ export const validateUsernamePassword = async (
 				errors: validatonErrors["errors"],
 			});
 		}
-	} catch (err) {
+	} catch (error) {
 		return res.sendStatus(400);
 	}
 	return next();
@@ -51,7 +51,7 @@ export const validateProjectNamePresent = async (
 				errors: validatonErrors["errors"],
 			});
 		}
-	} catch (err) {
+	} catch (error) {
 		return res.sendStatus(400);
 	}
 	return next();
@@ -78,7 +78,7 @@ export const validateProjectNameAndDescription = async (
 				errors: validatonErrors["errors"],
 			});
 		}
-	} catch (err) {
+	} catch (error) {
 		return res.sendStatus(400);
 	}
 	return next();
@@ -102,7 +102,7 @@ export const validateProjectId = async (
 				errors: validatonErrors["errors"],
 			});
 		}
-	} catch (err) {
+	} catch (error) {
 		return res.sendStatus(400);
 	}
 	return next();
@@ -127,7 +127,7 @@ export const validateColumnName = async (
 				errors: validatonErrors["errors"],
 			});
 		}
-	} catch (err) {
+	} catch (error) {
 		return res.sendStatus(400);
 	}
 	return next();
@@ -162,7 +162,7 @@ export const validateColumnIndices = async (
 				errors: validatonErrors["errors"],
 			});
 		}
-	} catch (err) {
+	} catch (error) {
 		return res.sendStatus(400);
 	}
 	return next();
@@ -185,7 +185,7 @@ export const validateColumnIdPresent = async (
 				errors: validatonErrors["errors"],
 			});
 		}
-	} catch (err) {
+	} catch (error) {
 		return res.sendStatus(400);
 	}
 	return next();
@@ -220,7 +220,7 @@ export const validateTicketIndices = async (
 				errors: validatonErrors["errors"],
 			});
 		}
-	} catch (err) {
+	} catch (error) {
 		return res.sendStatus(400);
 	}
 	return next();
@@ -243,7 +243,7 @@ export const validateTicketTitlePresent = async (
 				errors: validatonErrors["errors"],
 			});
 		}
-	} catch (err) {
+	} catch (error) {
 		return res.sendStatus(400);
 	}
 	return next();
@@ -270,7 +270,7 @@ export const validateTicketTitleAndDescription = async (
 				errors: validatonErrors["errors"],
 			});
 		}
-	} catch (err) {
+	} catch (error) {
 		return res.sendStatus(400);
 	}
 	return next();

@@ -10,8 +10,8 @@ export const createColumn = async (
 		const savedColumn = await ColumnModel.create({ columnName });
 		await projectService.addColumnIdToProject(projectId, savedColumn._id);
 		return savedColumn;
-	} catch (err) {
-		if (err instanceof BaseError) return Promise.reject(err);
+	} catch (error) {
+		if (error instanceof BaseError) return Promise.reject(error);
 		return Promise.reject(new BaseError({ statusCode: 500 }));
 	}
 };
@@ -39,7 +39,7 @@ export const updateColumn = async (
 			);
 		}
 		return updatedColumn;
-	} catch (err) {
+	} catch (error) {
 		return Promise.reject(new BaseError({ statusCode: 500 }));
 	}
 };
@@ -108,8 +108,8 @@ export const swapTicketsInSameColumn = async (
 				})
 			);
 		}
-	} catch (err) {
-		if (err instanceof BaseError) return Promise.reject(err);
+	} catch (error) {
+		if (error instanceof BaseError) return Promise.reject(error);
 		return Promise.reject(new BaseError({ statusCode: 500 }));
 	}
 };

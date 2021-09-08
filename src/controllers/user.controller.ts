@@ -48,8 +48,8 @@ export const login = async (req: Request, res: Response) => {
 
 export const logout = async (req: Request, res: Response) => {
 	try {
-		req.session.destroy((err) => {
-			if (err) {
+		req.session.destroy((error) => {
+			if (error) {
 				return res.sendStatus(500);
 			}
 			res.clearCookie("connect.sid"); //clear coookie
@@ -58,7 +58,7 @@ export const logout = async (req: Request, res: Response) => {
 				message: "logged out successfully!",
 			});
 		});
-	} catch (err) {
+	} catch (error) {
 		return res.sendStatus(500);
 	}
 };

@@ -41,11 +41,11 @@ export const addProject = async (req: Request, res: Response) => {
 				projectId,
 			},
 		});
-	} catch (err) {
-		if (err instanceof BaseError) {
-			return res.status(err.statusCode).json({
+	} catch (error) {
+		if (error instanceof BaseError) {
+			return res.status(error.statusCode).json({
 				success: false,
-				message: err.description,
+				message: error.description,
 			});
 		}
 		return res.sendStatus(500);
@@ -66,11 +66,11 @@ export const getAllProjects = async (req: Request, res: Response) => {
 				projects,
 			},
 		});
-	} catch (err) {
-		if (err instanceof BaseError) {
-			return res.status(err.statusCode).json({
+	} catch (error) {
+		if (error instanceof BaseError) {
+			return res.status(error.statusCode).json({
 				success: false,
-				message: err.description,
+				message: error.description,
 			});
 		}
 		return res.sendStatus(500);
@@ -86,11 +86,11 @@ export const openProject = async (req: Request, res: Response) => {
 			status: 200,
 			data: lodash.omit(project.toJSON(), ["__v", "userIds"]),
 		});
-	} catch (err) {
-		if (err instanceof BaseError) {
-			return res.status(err.statusCode).json({
+	} catch (error) {
+		if (error instanceof BaseError) {
+			return res.status(error.statusCode).json({
 				success: false,
-				message: err.description,
+				message: error.description,
 			});
 		}
 		return res.sendStatus(500);
@@ -109,11 +109,11 @@ export const updateProject = async (req: Request, res: Response) => {
 			success: true,
 			data: lodash.pick(updatedProject, ["projectName", "description"]),
 		});
-	} catch (err) {
-		if (err instanceof BaseError) {
-			return res.status(err.statusCode).json({
+	} catch (error) {
+		if (error instanceof BaseError) {
+			return res.status(error.statusCode).json({
 				success: false,
-				message: err.description,
+				message: error.description,
 			});
 		}
 		return res.sendStatus(500);
@@ -138,11 +138,11 @@ export const deleteProject = async (req: Request, res: Response) => {
 				"description",
 			]),
 		});
-	} catch (err) {
-		if (err instanceof BaseError) {
-			return res.status(err.statusCode).json({
+	} catch (error) {
+		if (error instanceof BaseError) {
+			return res.status(error.statusCode).json({
 				success: false,
-				message: err.description,
+				message: error.description,
 			});
 		}
 		return res.sendStatus(500);
@@ -156,7 +156,7 @@ export const closeProject = async (req: Request, res: Response) => {
 			success: true,
 			message: "project closed",
 		});
-	} catch (err) {
+	} catch (error) {
 		return res.sendStatus(500);
 	}
 };
