@@ -23,6 +23,7 @@ router.patch(
 	ticketController.updateTicket
 );
 
+// swap inside same column
 router.post(
 	"/swap",
 	validator.validateColumnIdPresent,
@@ -30,7 +31,11 @@ router.post(
 	ticketController.swapTickets
 );
 
-//swap across columns
-// router.patch("/swapacross");
+// move across columns
+router.post(
+	"/moveacross/:ticketId",
+	validator.validateMoveAcross,
+	ticketController.moveTicketAcrossColumns
+);
 
 export default router;

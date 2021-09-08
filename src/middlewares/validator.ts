@@ -275,3 +275,42 @@ export const validateTicketTitleAndDescription = async (
 	}
 	return next();
 };
+
+export const validateMoveAcross = async (
+	req: Request,
+	res: Response,
+	next: NextFunction
+) => {
+	try {
+		await body("columnFromId")
+			.notEmpty()
+			.withMessage("columnFromId should be present")
+			.run(req);
+		await body("columnToId")
+			.notEmpty()
+			.withMessage("columnToId should be present")
+			.run(req);
+		await check("ticketId")
+			.notEmpty()
+			.withMessage("ticketId should be present")
+			.run(req);
+		await body("ticketIndex")
+			.notEmpty()
+			.withMessage("ticketIndex should be present")
+			.isNumeric()
+			.withMessage("ticketIndex should be numeric")
+			.isFloat({ min: 0 })
+			.withMessage("ticketIndex should not be lower than 0")
+			.run(req);
+		const validatonErrors = validationResult(req);
+		if (validatonErrors && !validatonErrors.isEmpty()) {
+			return res.status(400).json({
+				success: false,
+				errors: validatonErrors["errors"],
+			});
+		}
+	} catch (error) {
+		return res.sendStatus(400);
+	}
+	return next();
+};

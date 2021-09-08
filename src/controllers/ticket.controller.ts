@@ -7,7 +7,10 @@ import { Request, Response } from "express";
 
 import { BaseError } from "../errors/base.error";
 import * as ticketService from "../services/ticket.service";
-import { swapTicketsInSameColumn } from "../services/column.service";
+import {
+	moveticketAcrossColumns,
+	swapTicketsInSameColumn,
+} from "../services/column.service";
 import log from "../util/logger";
 
 export const createTicket = async (req: Request, res: Response) => {
@@ -66,6 +69,31 @@ export const swapTickets = async (req: Request, res: Response) => {
 		return res.status(200).json({
 			success: true,
 			data: updatedTicketIds,
+		});
+	} catch (error) {
+		if (error instanceof BaseError) {
+			return res.status(error.statusCode).json({
+				success: false,
+				message: error.description,
+			});
+		}
+		return res.sendStatus(500);
+	}
+};
+
+export const moveTicketAcrossColumns = async (req: Request, res: Response) => {
+	try {
+		const { ticketId } = req.params;
+		const { columnFromId, columnToId, ticketIndex } = req.body;
+		await moveticketAcrossColumns(
+			columnFromId,
+			columnToId,
+			ticketIndex,
+			ticketId
+		);
+		return res.status(200).json({
+			success: true,
+			message: `ticketId ${ticketId} moved from column ${columnFromId} to ${columnToId} at index ${ticketIndex}`,
 		});
 	} catch (error) {
 		if (error instanceof BaseError) {
