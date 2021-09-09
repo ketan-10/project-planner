@@ -38,6 +38,29 @@ export const getColumnByColumnId = async (
 	}
 };
 
+export const getManyColumnsById = async (
+	columnIds: string[]
+): Promise<IColumn[]> => {
+	try {
+		const columns = await ColumnModel.find({
+			_id: {
+				$in: columnIds,
+			},
+		});
+		if (!columns) {
+			return Promise.reject(
+				new BaseError({
+					statusCode: 404,
+					description: `columns not found`,
+				})
+			);
+		}
+		return columns;
+	} catch (error) {
+		return Promise.reject(new BaseError({ statusCode: 500 }));
+	}
+};
+
 export const updateColumn = async (
 	columnId: string,
 	columnName: string

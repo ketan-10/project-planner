@@ -1,7 +1,8 @@
 import { BaseError } from "../errors/base.error";
-import ProjectModel, { IProject } from "../models/Project";
+import ProjectModel, { AssembeledProject, IProject } from "../models/Project";
 import * as userService from "../services/user.service";
 import * as columnService from "../services/column.service";
+import * as ticketService from "../services/ticket.service";
 import log from "../util/logger";
 import { Types } from "mongoose";
 
@@ -36,7 +37,9 @@ export const getUserProjects = async (
 	}
 };
 
-export const getOneProject = async (projectId: string): Promise<IProject> => {
+export const getOneProject = async (
+	projectId: string
+): Promise<AssembeledProject> => {
 	try {
 		const project = await ProjectModel.findById(projectId);
 		if (!project) {
@@ -47,8 +50,21 @@ export const getOneProject = async (projectId: string): Promise<IProject> => {
 				})
 			);
 		}
-		return Promise.resolve(project);
+		const columns = await columnService.getManyColumnsById(
+			project.columnIds
+		);
+		const ticketIds: Array<Array<string>> = [];
+		columns.forEach((column) => ticketIds.push(column.ticketIds));
+		const tickets = await ticketService.getManyTicketsById(
+			ticketIds.flat()
+		);
+		return {
+			project,
+			columns,
+			tickets,
+		};
 	} catch (error) {
+		if (error instanceof BaseError) return Promise.reject(error);
 		return Promise.reject(new BaseError({ statusCode: 500 }));
 	}
 };

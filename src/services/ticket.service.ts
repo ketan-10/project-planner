@@ -60,6 +60,29 @@ export const getTicketById = async (ticketId: string): Promise<ITicket> => {
 	}
 };
 
+export const getManyTicketsById = async (
+	ticketIds: string[]
+): Promise<ITicket[]> => {
+	try {
+		const tickets = await TicketModel.find({
+			_id: {
+				$in: ticketIds,
+			},
+		});
+		if (!tickets) {
+			return Promise.reject(
+				new BaseError({
+					statusCode: 404,
+					description: `tickets not found`,
+				})
+			);
+		}
+		return tickets;
+	} catch (error) {
+		return Promise.reject(new BaseError({ statusCode: 500 }));
+	}
+};
+
 export const updateColumnId = async (
 	ticketId: string,
 	columnId: string

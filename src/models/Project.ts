@@ -1,10 +1,18 @@
 import { Schema, model, Document } from "mongoose";
+import { IColumn } from "./Column";
+import { ITicket } from "./Ticket";
 
 export interface IProject extends Document {
 	projectName: string;
 	description: string;
 	userIds: Array<string>;
 	columnIds: Array<string>;
+}
+
+export interface AssembeledProject {
+	project: IProject;
+	columns: IColumn[];
+	tickets: ITicket[];
 }
 
 export const ProjectSchema = new Schema({

@@ -80,11 +80,11 @@ export const getAllProjects = async (req: Request, res: Response) => {
 export const openProject = async (req: Request, res: Response) => {
 	try {
 		const { projectId } = req.params;
-		const project = await projectService.getOneProject(projectId);
-		req.session.projectId = project._id; //opened a project
+		const assembeledProject = await projectService.getOneProject(projectId);
+		req.session.projectId = assembeledProject.project._id; //opened a project
 		return res.status(200).json({
 			status: 200,
-			data: lodash.omit(project.toJSON(), ["__v", "userIds"]),
+			data: assembeledProject,
 		});
 	} catch (error) {
 		if (error instanceof BaseError) {
