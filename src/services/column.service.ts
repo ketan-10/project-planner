@@ -10,7 +10,7 @@ export const createColumn = async (
 	columnName: string
 ): Promise<IColumn> => {
 	try {
-		const savedColumn = await ColumnModel.create({ columnName });
+		const savedColumn = await ColumnModel.create({ columnName, projectId });
 		await projectService.addColumnIdToProject(projectId, savedColumn._id);
 		return savedColumn;
 	} catch (error) {
@@ -216,18 +216,21 @@ export const deleteOneTicket = async (ticketId: string): Promise<boolean> => {
 			ticket.columnId.toString(),
 			{
 				$pull: {
-					ticketids: new Types.ObjectId(ticketId),
+					ticketIds: new Types.ObjectId(ticketId),
 				},
 			},
 			{ new: true }
 		);
-		if (!updatedColumn || updatedColumn.ticketIds.includes(ticketId)) {
+		if (!updatedColumn) {
 			return Promise.reject(
 				new BaseError({
 					statusCode: 404,
 					description: `columnId ${ticket.columnId.toString()} not found`,
 				})
 			);
+		}
+		if (updatedColumn.ticketIds.includes(ticketId)) {
+			return Promise.reject(new BaseError({ statusCode: 500 }));
 		}
 		await ticketService.deleteOneTicketById(ticketId);
 		return true;
@@ -258,9 +261,42 @@ export const truncateColumnById = async (
 				})
 			);
 		}
-		await ticketService.deleteManyTicketsByIds(
-			column.ticketIds as string[]
+		await ticketService.deleteManyTicketsByIds(column.ticketIds);
+		return true;
+	} catch (error) {
+		if (error instanceof BaseError) return Promise.reject(error);
+		return Promise.reject(new BaseError({ statusCode: 500 }));
+	}
+};
+
+export const deleteColumnById = async (columnId: string): Promise<boolean> => {
+	try {
+		const column = await ColumnModel.findByIdAndDelete(columnId);
+		if (!column) {
+			return Promise.reject(
+				new BaseError({
+					statusCode: 404,
+					description: `columnId ${columnId} not found`,
+				})
+			);
+		}
+		await ticketService.deleteManyTicketsByIds(column.ticketIds);
+		await projectService.deleteColumnIdFromProject(
+			column.projectId,
+			columnId
 		);
+		return true;
+	} catch (error) {
+		if (error instanceof BaseError) return Promise.reject(error);
+		return Promise.reject(new BaseError({ statusCode: 500 }));
+	}
+};
+
+export const deleteManyColumnsById = async (
+	columnIds: string[]
+): Promise<boolean> => {
+	try {
+		columnIds.forEach((columnId) => deleteColumnById(columnId));
 		return true;
 	} catch (error) {
 		if (error instanceof BaseError) return Promise.reject(error);

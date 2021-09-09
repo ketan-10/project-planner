@@ -98,7 +98,12 @@ export const deleteProjectId = async (
 			}
 		);
 		if (!updatedUser)
-			return Promise.reject(new BaseError({ statusCode: 404 }));
+			return Promise.reject(
+				new BaseError({
+					statusCode: 404,
+					description: `userId ${userId} not found`,
+				})
+			);
 		return updatedUser.projectIds.includes(projectId)
 			? Promise.reject(false)
 			: Promise.resolve(true);

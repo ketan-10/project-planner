@@ -101,3 +101,41 @@ export const swapColumns = async (req: Request, res: Response) => {
 		return res.sendStatus(500);
 	}
 };
+
+export const truncateColumn = async (req: Request, res: Response) => {
+	try {
+		const { columnId } = req.params;
+		await columnService.truncateColumnById(columnId);
+		return res.status(200).json({
+			success: true,
+			message: `columnId ${columnId} truncated`,
+		});
+	} catch (error) {
+		if (error instanceof BaseError) {
+			return res.status(error.statusCode).json({
+				success: false,
+				message: error.description,
+			});
+		}
+		return res.sendStatus(500);
+	}
+};
+
+export const deleteColumn = async (req: Request, res: Response) => {
+	try {
+		const { columnId } = req.params;
+		await columnService.deleteColumnById(columnId);
+		return res.status(200).json({
+			success: true,
+			message: `columnId ${columnId} deleted`,
+		});
+	} catch (error) {
+		if (error instanceof BaseError) {
+			return res.status(error.statusCode).json({
+				success: false,
+				message: error.description,
+			});
+		}
+		return res.sendStatus(500);
+	}
+};

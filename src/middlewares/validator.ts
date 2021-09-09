@@ -117,8 +117,8 @@ export const validateColumnName = async (
 		await body("columnName")
 			.notEmpty()
 			.withMessage("columnName must be present")
-			.isLength({ max: 20 })
-			.withMessage("column name must be max 20 characters long")
+			.isLength({ max: 50 })
+			.withMessage("column name must be max 50 characters long")
 			.run(req);
 		const validatonErrors = validationResult(req);
 		if (validatonErrors && !validatonErrors.isEmpty()) {

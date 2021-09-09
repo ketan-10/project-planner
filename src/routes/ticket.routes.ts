@@ -38,4 +38,7 @@ router.post(
 	ticketController.moveTicketAcrossColumns
 );
 
+// delete one ticket
+router.delete("/:ticketId", ticketController.deleteOneTicket);
+
 export default router;

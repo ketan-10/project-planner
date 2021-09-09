@@ -103,3 +103,22 @@ export const moveTicketAcrossColumns = async (req: Request, res: Response) => {
 		return res.sendStatus(500);
 	}
 };
+
+export const deleteOneTicket = async (req: Request, res: Response) => {
+	try {
+		const { ticketId } = req.params;
+		await columnService.deleteOneTicket(ticketId);
+		return res.status(200).json({
+			success: true,
+			message: `ticketId ${ticketId} removed`,
+		});
+	} catch (error) {
+		if (error instanceof BaseError) {
+			return res.status(error.statusCode).json({
+				success: false,
+				message: error.description,
+			});
+		}
+		return res.sendStatus(500);
+	}
+};

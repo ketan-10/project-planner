@@ -1,7 +1,9 @@
 import { BaseError } from "../errors/base.error";
 import ProjectModel, { IProject } from "../models/Project";
 import * as userService from "../services/user.service";
+import * as columnService from "../services/column.service";
 import log from "../util/logger";
+import { Types } from "mongoose";
 
 export const getUserProjects = async (
 	userId: string
@@ -105,7 +107,6 @@ export const deleteProject = async (
 ): Promise<IProject> => {
 	try {
 		await userService.deleteProjectId(userId, projectId);
-		//TODO delete column documents.
 		const deletedProject = await ProjectModel.findByIdAndDelete(projectId);
 		if (!deletedProject) {
 			return Promise.reject(
@@ -115,6 +116,7 @@ export const deleteProject = async (
 				})
 			);
 		}
+		await columnService.deleteManyColumnsById(deletedProject.columnIds);
 		return deletedProject;
 	} catch (error) {
 		if (error instanceof BaseError) return Promise.reject(error);
@@ -186,7 +188,37 @@ export const addColumnIdToProject = async (
 	}
 };
 
-export const deleteColumn = async () => {};
+export const deleteColumnIdFromProject = async (
+	projectId: string,
+	columnId: string
+): Promise<boolean> => {
+	try {
+		const updatedProject = await ProjectModel.findByIdAndUpdate(
+			projectId,
+			{
+				$pull: {
+					columnIds: new Types.ObjectId(columnId),
+				},
+			},
+			{
+				new: true,
+			}
+		);
+		if (!updatedProject) {
+			return Promise.reject(
+				new BaseError({
+					statusCode: 404,
+					description: `projectId ${projectId} not found`,
+				})
+			);
+		}
+		return updatedProject?.columnIds.includes(columnId)
+			? Promise.reject(new BaseError({ statusCode: 500 }))
+			: Promise.resolve(true);
+	} catch (error) {
+		return Promise.reject(new BaseError({ statusCode: 500 }));
+	}
+};
 
 export const swapColumns = async (
 	projectId: string,
