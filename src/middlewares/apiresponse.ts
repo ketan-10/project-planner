@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import status from "http-status";
 import { BaseError } from "../errors/base.error";
 
-export const responseFormat = (
+export const apiresponse = (
 	_req: Request,
 	res: Response,
 	next: NextFunction
@@ -13,12 +13,14 @@ export const responseFormat = (
 			message,
 		});
 	};
+
 	res.sendSuccessWithData = (data: object) => {
 		return res.status(200).json({
 			success: true,
 			data,
 		});
 	};
+
 	res.sendError = (error: any) => {
 		if (error instanceof BaseError) {
 			return res.status(error.statusCode).json({
@@ -31,6 +33,7 @@ export const responseFormat = (
 			message: "Internal Server Error.",
 		});
 	};
+
 	res.sendAPIStatus = (statusCode: number) => {
 		const statusClass = status[`${statusCode}_CLASS`] as string;
 		const message = status[statusCode] as string;
@@ -39,11 +42,13 @@ export const responseFormat = (
 			message,
 		});
 	};
+
 	res.sendBadRequest = (message: string) => {
 		return res.status(400).json({
 			success: false,
 			message,
 		});
 	};
+
 	return next();
 };
