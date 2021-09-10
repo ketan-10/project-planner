@@ -135,6 +135,14 @@ export const moveTickets = async (columns: IColumn[]): Promise<any> => {
 				);
 			})
 		);
+		await Promise.all(
+			columns.map((column) => {
+				return ticketService.updateManyColumnIds(
+					column.ticketIds,
+					column._id
+				);
+			})
+		);
 		return updatedColumns;
 	} catch (error) {
 		if (error instanceof BaseError) return Promise.reject(error);

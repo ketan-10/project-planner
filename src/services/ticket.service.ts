@@ -83,13 +83,17 @@ export const getManyTicketsById = async (
 	}
 };
 
-export const updateColumnId = async (
-	ticketId: string,
+export const updateManyColumnIds = async (
+	ticketIds: string[],
 	columnId: string
 ): Promise<boolean> => {
 	try {
-		const updatedTicket = await TicketModel.findByIdAndUpdate(
-			ticketId,
+		const updatedTicket = await TicketModel.updateMany(
+			{
+				_id: {
+					$in: ticketIds,
+				},
+			},
 			{
 				columnId,
 			},
@@ -101,7 +105,6 @@ export const updateColumnId = async (
 			return Promise.reject(
 				new BaseError({
 					statusCode: 404,
-					description: `ticketId ${ticketId} not found`,
 				})
 			);
 		}
