@@ -1,8 +1,9 @@
 import { NextFunction, Request, Response } from "express";
+import status from "http-status";
 import { BaseError } from "../errors/base.error";
 
-export const apiResponse = (
-	req: Request,
+export const responseFormat = (
+	_req: Request,
 	res: Response,
 	next: NextFunction
 ) => {
@@ -18,7 +19,7 @@ export const apiResponse = (
 			data,
 		});
 	};
-	res.sendFailure = (error: any) => {
+	res.sendError = (error: any) => {
 		if (error instanceof BaseError) {
 			return res.status(error.statusCode).json({
 				success: false,
@@ -30,10 +31,18 @@ export const apiResponse = (
 			message: "Internal Server Error.",
 		});
 	};
-	res.sendValidationErrors = (errors: object) => {
+	res.sendAPIStatus = (statusCode: number) => {
+		const statusClass = status[`${statusCode}_CLASS`] as string;
+		const message = status[statusCode] as string;
+		return res.status(statusCode).json({
+			success: statusClass === "2xx",
+			message,
+		});
+	};
+	res.sendBadRequest = (message: string) => {
 		return res.status(400).json({
 			success: false,
-			errors,
+			message,
 		});
 	};
 	return next();

@@ -1,5 +1,5 @@
 import { Response } from "express";
-import { APIResponse } from "../models/APIResponse";
+import { IResponse } from "../models/IResponse";
 import { IUser } from "../models/User";
 
 declare global {
@@ -10,10 +10,12 @@ declare global {
 			projectId: string;
 		}
 		export interface Response {
-			sendSuccess(message: string): Response<APIResponse>;
-			sendSuccessWithData(data: object): Response<APIResponse>;
-			sendFailure(error: any): Response<APIResponse>;
-			sendValidationErrors(errors: object): Response<APIResponse>;
+			sendSuccess(message: string): Response<IResponse>;
+			sendSuccessWithData(data: object): Response<IResponse>;
+			sendError(error: any): Response<IResponse>;
+			sendValidationErrors(errors: object): Response<IResponse>;
+			sendAPIStatus(statusCode: number): Response<IResponse>;
+			sendBadRequest(message: string): Response<IResponse>;
 		}
 	}
 }

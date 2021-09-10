@@ -19,6 +19,7 @@ import projectRoutes from "./routes/project.routes";
 import userRoutes from "./routes/user.routes";
 import columnRoutes from "./routes/column.routes";
 import ticketRoutes from "./routes/ticket.routes";
+import { responseFormat } from "./middlewares/responseFormat";
 
 const RedisStore = connectRedis(session);
 const redisClient = redis.createClient({
@@ -64,11 +65,12 @@ mongoose
 	.then((_result) => console.log("connected to mongoDB!"))
 	.catch((error) => console.log(error));
 
+app.use(responseFormat);
+
 app.use("/users", userRoutes);
 app.use("/projects", projectRoutes);
 app.use("/columns", columnRoutes);
 app.use("/tickets", ticketRoutes);
-
 //if no route returns response, send 404
 app.use((_, res) => res.sendStatus(404));
 

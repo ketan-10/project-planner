@@ -121,6 +121,7 @@ export const addTicketIdToColumn = async (
 
 export const moveTickets = async (columns: IColumn[]): Promise<any> => {
 	try {
+		if (!columns) return Promise.resolve([]);
 		const updatedColumns = await Promise.all(
 			columns.map((column) => {
 				return ColumnModel.findByIdAndUpdate(
@@ -134,7 +135,6 @@ export const moveTickets = async (columns: IColumn[]): Promise<any> => {
 				);
 			})
 		);
-		log.info(updatedColumns);
 		return updatedColumns;
 	} catch (error) {
 		if (error instanceof BaseError) return Promise.reject(error);

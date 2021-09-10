@@ -266,7 +266,11 @@ export const changeState = async (
 		 * column service will move tickets.
 		 */
 		let updatedProject: IProject | null;
-		if (state.project.columnIds && state.project.columnIds.length > 0) {
+		if (
+			state.project &&
+			state.project.columnIds &&
+			state.project.columnIds.length > 0
+		) {
 			updatedProject = await ProjectModel.findByIdAndUpdate(
 				projectId,
 				{
@@ -288,13 +292,7 @@ export const changeState = async (
 		const updatedColumns: IColumn[] = await columnService.moveTickets(
 			state.columns
 		);
-		return {
-			project:
-				state.project.columnIds && state.project.columnIds.length > 0
-					? updatedProject!
-					: state.project,
-			columns: updatedColumns,
-		};
+		return state;
 	} catch (error) {
 		if (error instanceof BaseError) return Promise.reject(error);
 		return Promise.reject(new BaseError({ statusCode: 500 }));
