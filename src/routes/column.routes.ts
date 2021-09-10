@@ -9,15 +9,30 @@ const router = Router();
 router.use(auth.isLoggedIn);
 router.use(auth.hasProjectOpened);
 
-router.post("/", validator.validateColumnName, columnController.createColumn);
+router.post(
+	"/",
+	validator.validatePresentInBody("columnName"),
+	validator.validateCharacterLength("columnName", 50),
+	columnController.createColumn
+);
 router.patch(
 	"/:columnId",
-	validator.validateColumnName,
+	validator.validatePresentInBody("columnName"),
+	validator.validateCharacterLength("columnName", 50),
+	validator.validatePathParamPresent("columnId"),
 	columnController.updateColumn
 );
 
-router.delete("/:columnId", columnController.deleteColumn);
+router.delete(
+	"/:columnId",
+	validator.validatePathParamPresent("columnId"),
+	columnController.deleteColumn
+);
 
-router.delete("/truncate/:columnId", columnController.truncateColumn);
+router.delete(
+	"/truncate/:columnId",
+	validator.validatePathParamPresent("columnId"),
+	columnController.truncateColumn
+);
 
 export default router;

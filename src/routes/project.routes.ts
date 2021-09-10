@@ -10,17 +10,23 @@ router.use(auth.isLoggedIn);
 
 router.post(
 	"/",
-	validator.validateProjectNamePresent,
-	validator.validateProjectNameAndDescription,
+	validator.validatePresentInBody("projectName"),
+	validator.validateCharacterLength("projectName", 40),
+	validator.validateCharacterLength("description", 600),
 	projectController.addProject
 );
 
 router.get("/", projectController.getAllProjects);
-router.get("/:projectId", projectController.openProject);
+router.get(
+	"/:projectId",
+	validator.validatePathParamPresent("projectId"),
+	projectController.openProject
+);
 
 router.patch(
 	"/:projectId",
-	validator.validateProjectNameAndDescription,
+	validator.validateCharacterLength("projectName", 40),
+	validator.validateCharacterLength("description", 600),
 	projectController.updateProject
 );
 

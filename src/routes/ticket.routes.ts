@@ -11,19 +11,25 @@ router.use(auth.hasProjectOpened);
 
 router.post(
 	"/",
-	validator.validateColumnIdPresent,
-	validator.validateTicketTitlePresent,
-	validator.validateTicketTitleAndDescription,
+	validator.validatePresentInBody("title"),
+	validator.validateCharacterLength("title", 80),
+	validator.validateCharacterLength("description", 400),
 	ticketController.createTicket
 );
 
 router.patch(
 	"/:ticketId",
-	validator.validateTicketTitleAndDescription,
+	validator.validatePathParamPresent("ticketId"),
+	validator.validateCharacterLength("title", 80),
+	validator.validateCharacterLength("description", 400),
 	ticketController.updateTicket
 );
 
 // delete one ticket
-router.delete("/:ticketId", ticketController.deleteOneTicket);
+router.delete(
+	"/:ticketId",
+	validator.validatePathParamPresent("ticketId"),
+	ticketController.deleteOneTicket
+);
 
 export default router;
