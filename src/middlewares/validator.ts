@@ -115,7 +115,6 @@ export const validateProjectState = (
 ) => {
 	try {
 		const state: Partial<AssembeledProject> = req.body.state;
-		log.info(JSON.stringify(req.session));
 		if (
 			state.project &&
 			state?.project.columnIds &&
