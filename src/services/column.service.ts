@@ -237,7 +237,16 @@ export const deleteManyColumnsById = async (
 	columnIds: string[]
 ): Promise<boolean> => {
 	try {
-		columnIds.forEach((columnId) => deleteColumnById(columnId));
+		const deletedColumns = await Promise.all(
+			columnIds.map((columnId) => {
+				return ColumnModel.findByIdAndDelete(columnId);
+			})
+		);
+		await Promise.all(
+			deletedColumns.map((column) =>
+				ticketService.deleteManyTicketsByIds(column?.ticketIds!)
+			)
+		);
 		return true;
 	} catch (error) {
 		if (error instanceof BaseError) return Promise.reject(error);

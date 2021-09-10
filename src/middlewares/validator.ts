@@ -10,6 +10,23 @@ import { BaseError } from "../errors/base.error";
 import { AssembeledProject } from "../models/Project";
 import log from "../util/logger";
 
+export const validateHeader = (
+	req: Request,
+	res: Response,
+	next: NextFunction
+) => {
+	try {
+		const appName = req.headers["x-app-name"];
+		if (!appName)
+			return res.sendBadRequest("X-App-Name header must be present");
+		if (appName !== "Project-Planner")
+			return res.sendBadRequest("X-App-Name invalid");
+		return next();
+	} catch (error) {
+		return res.sendAPIStatus(400);
+	}
+};
+
 export const validatePresentInBody = (...args: string[]): RequestHandler => {
 	return async (req: Request, res: Response, next: NextFunction) => {
 		try {

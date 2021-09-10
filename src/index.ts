@@ -21,6 +21,7 @@ import columnRoutes from "./routes/column.routes";
 import ticketRoutes from "./routes/ticket.routes";
 import { apiresponse } from "./middlewares/api.mw";
 import log from "./util/logger";
+import { validateHeader } from "./middlewares/validator";
 
 const RedisStore = connectRedis(session);
 const redisClient = redis.createClient({
@@ -62,11 +63,14 @@ app.use(
 );
 
 app.use(apiresponse);
+app.use(validateHeader);
 
-app.use("/users", userRoutes);
-app.use("/projects", projectRoutes);
-app.use("/columns", columnRoutes);
-app.use("/tickets", ticketRoutes);
+app.use("/api/v1/users", userRoutes);
+app.use("/api/v1/projects", projectRoutes);
+app.use("/api/v1/columns", columnRoutes);
+app.use("/api/v1/tickets", ticketRoutes);
+
+app.use((_, res) => res.sendAPIStatus(404));
 
 const startServer = async () => {
 	try {
@@ -79,7 +83,5 @@ const startServer = async () => {
 		log.error(error);
 	}
 };
-
-app.use((_, res) => res.sendAPIStatus(404));
 
 startServer();

@@ -190,8 +190,6 @@ export const addUser = async (
 	}
 };
 
-export const removeUser = async () => {};
-
 export const addColumnIdToProject = async (
 	projectId: string,
 	columnId: string
@@ -252,6 +250,7 @@ export const deleteColumnIdFromProject = async (
 			? Promise.reject(new BaseError({ statusCode: 500 }))
 			: Promise.resolve(true);
 	} catch (error) {
+		if (error instanceof BaseError) return Promise.reject(error);
 		return Promise.reject(new BaseError({ statusCode: 500 }));
 	}
 };
