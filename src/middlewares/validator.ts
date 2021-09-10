@@ -10,9 +10,6 @@ import { BaseError } from "../errors/base.error";
 import { AssembeledProject } from "../models/Project";
 import log from "../util/logger";
 
-//TODO use "message: instead of errors[]"
-//TODO make a common validator, instead of repeating same logic across functions
-
 export const validatePresentInBody = (...args: string[]): RequestHandler => {
 	return async (req: Request, res: Response, next: NextFunction) => {
 		try {
@@ -105,7 +102,7 @@ export const validatePathParamPresent = (parameter: string): RequestHandler => {
 				});
 			}
 		} catch (error) {
-			return res.sendStatus(400);
+			return res.sendAPIStatus(400);
 		}
 		return next();
 	};
