@@ -1,5 +1,5 @@
 import { Response } from "express";
-import { IResponse } from "../models/IResponse";
+import { IResponse } from "../types/IResponse";
 import { IUser } from "../models/User";
 
 declare global {
