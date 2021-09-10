@@ -119,113 +119,23 @@ export const addTicketIdToColumn = async (
 	}
 };
 
-export const swapTicketsInSameColumn = async (
-	columnId: string,
-	firstIndex: number,
-	secondIndex: number
-): Promise<Array<string>> => {
+export const moveTickets = async (columns: IColumn[]): Promise<any> => {
 	try {
-		const column = await ColumnModel.findById(columnId);
-		if (!column) {
-			return Promise.reject(
-				new BaseError({
-					statusCode: 404,
-					description: `columnId ${columnId} not found`,
-				})
-			);
-		}
-		const ticketIds = column.ticketIds;
-		if (firstIndex < ticketIds.length && secondIndex < ticketIds.length) {
-			[ticketIds[firstIndex], ticketIds[secondIndex]] = [
-				ticketIds[secondIndex],
-				ticketIds[firstIndex],
-			];
-			await ColumnModel.findByIdAndUpdate(columnId, {
-				ticketIds,
-			});
-			return ticketIds;
-		} else {
-			return Promise.reject(
-				new BaseError({
-					statusCode: 400,
-					description:
-						"first, and second indices must be less than number of tickets",
-				})
-			);
-		}
-	} catch (error) {
-		if (error instanceof BaseError) return Promise.reject(error);
-		return Promise.reject(new BaseError({ statusCode: 500 }));
-	}
-};
-
-export const moveticketAcrossColumns = async (
-	targetColumnId: string,
-	ticketIndex: number,
-	ticketId: string
-): Promise<boolean> => {
-	try {
-		const ticket = await ticketService.getTicketById(ticketId);
-		const [columnFromId, columnToId]: string[] = [
-			ticket.columnId.toString(),
-			targetColumnId,
-		];
-		const [columnFrom, columnTo]: IColumn[] = await Promise.all([
-			getColumnByColumnId(columnFromId),
-			getColumnByColumnId(columnToId),
-		]);
-		if (!columnFrom.ticketIds.includes(ticketId)) {
-			return Promise.reject(
-				new BaseError({
-					statusCode: 400,
-					description: `ticketId ${ticketId} not present in columnId ${columnFromId}`,
-				})
-			);
-		}
-		if (ticketIndex > columnTo.ticketIds.length) {
-			return Promise.reject(
-				new BaseError({
-					statusCode: 400,
-					description: `ticketIndex ${ticketIndex} should be less than or equal to target ticket size`,
-				})
-			);
-		}
-		const deleteFromColumn = ColumnModel.findByIdAndUpdate(
-			columnFromId,
-			{
-				ticketIds: columnFrom.ticketIds.filter(
-					(tktid) => tktid.toString() !== ticketId
-				),
-			},
-			{
-				new: true,
-			}
+		const updatedColumns = await Promise.all(
+			columns.map((column) => {
+				return ColumnModel.findByIdAndUpdate(
+					column._id,
+					{
+						ticketIds: column.ticketIds,
+					},
+					{
+						new: true,
+					}
+				);
+			})
 		);
-
-		const updatedTickets = columnTo.ticketIds;
-		if (ticketIndex === updatedTickets.length) {
-			updatedTickets.push(ticketId);
-		} else {
-			updatedTickets.splice(ticketIndex, 0, ticketId);
-		}
-
-		const updateToColumn = ColumnModel.findByIdAndUpdate(
-			columnToId,
-			{
-				ticketIds: updatedTickets,
-			},
-			{
-				new: true,
-			}
-		);
-
-		const updateColumnId = ticketService.updateColumnId(
-			ticketId,
-			columnToId
-		);
-
-		await Promise.all([deleteFromColumn, updateToColumn, updateColumnId]);
-		return true;
+		log.info(updatedColumns);
+		return updatedColumns;
 	} catch (error) {
 		if (error instanceof BaseError) return Promise.reject(error);
 		return Promise.reject(new BaseError({ statusCode: 500 }));

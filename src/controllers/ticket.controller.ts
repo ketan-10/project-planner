@@ -17,6 +17,10 @@ export const createTicket = async (req: Request, res: Response) => {
 			title,
 			description,
 		});
+		if (!req.session.ticketIds) {
+			req.session.ticketIds = [];
+		}
+		req.session.ticketIds.push(ticketId);
 		return res.status(200).json({
 			success: true,
 			data: { ticketId },
@@ -55,59 +59,14 @@ export const updateTicket = async (req: Request, res: Response) => {
 	}
 };
 
-export const swapTickets = async (req: Request, res: Response) => {
-	try {
-		const { columnId, firstIndex, secondIndex } = req.body;
-		const updatedTicketIds = await columnService.swapTicketsInSameColumn(
-			columnId,
-			firstIndex,
-			secondIndex
-		);
-		return res.status(200).json({
-			success: true,
-			data: {
-				updatedTicketIds,
-			},
-		});
-	} catch (error) {
-		if (error instanceof BaseError) {
-			return res.status(error.statusCode).json({
-				success: false,
-				message: error.description,
-			});
-		}
-		return res.sendStatus(500);
-	}
-};
-
-export const moveTicketAcrossColumns = async (req: Request, res: Response) => {
-	try {
-		const { ticketId } = req.params;
-		const { targetColumnId, ticketIndex } = req.body;
-		await columnService.moveticketAcrossColumns(
-			targetColumnId,
-			ticketIndex,
-			ticketId
-		);
-		return res.status(200).json({
-			success: true,
-			message: `ticketId ${ticketId} moved to column ${targetColumnId} at index ${ticketIndex}`,
-		});
-	} catch (error) {
-		if (error instanceof BaseError) {
-			return res.status(error.statusCode).json({
-				success: false,
-				message: error.description,
-			});
-		}
-		return res.sendStatus(500);
-	}
-};
-
 export const deleteOneTicket = async (req: Request, res: Response) => {
 	try {
 		const { ticketId } = req.params;
 		await columnService.deleteOneTicket(ticketId);
+		req.session.ticketIds?.splice(
+			req.session.ticketIds.indexOf(ticketId),
+			1
+		);
 		return res.status(200).json({
 			success: true,
 			message: `ticketId ${ticketId} removed`,

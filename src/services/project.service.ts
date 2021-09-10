@@ -5,6 +5,7 @@ import * as columnService from "../services/column.service";
 import * as ticketService from "../services/ticket.service";
 import log from "../util/logger";
 import { Types } from "mongoose";
+import { IColumn } from "../models/Column";
 
 export const getUserProjects = async (
 	userId: string
@@ -37,7 +38,26 @@ export const getUserProjects = async (
 	}
 };
 
-export const getOneProject = async (
+export const getProjectByProjectId = async (
+	projectId: string
+): Promise<IProject> => {
+	try {
+		const project = await ProjectModel.findById(projectId);
+		if (!project) {
+			return Promise.reject(
+				new BaseError({
+					statusCode: 404,
+					description: `projectId ${projectId} not found`,
+				})
+			);
+		}
+		return project;
+	} catch (error) {
+		return Promise.reject(new BaseError({ statusCode: 500 }));
+	}
+};
+
+export const openProject = async (
 	projectId: string
 ): Promise<AssembeledProject> => {
 	try {
@@ -236,40 +256,45 @@ export const deleteColumnIdFromProject = async (
 	}
 };
 
-export const swapColumns = async (
+export const changeState = async (
 	projectId: string,
-	firstIndex: number,
-	secondIndex: number
-): Promise<Array<string>> => {
+	state: AssembeledProject
+): Promise<Partial<AssembeledProject>> => {
 	try {
-		const project = await ProjectModel.findById(projectId);
-		if (!project) {
-			return Promise.reject(
-				new BaseError({
-					statusCode: 404,
-					description: `projectId ${projectId} not found`,
-				})
+		/**
+		 * project service will move columns.
+		 * column service will move tickets.
+		 */
+		let updatedProject: IProject | null;
+		if (state.project.columnIds && state.project.columnIds.length > 0) {
+			updatedProject = await ProjectModel.findByIdAndUpdate(
+				projectId,
+				{
+					columnIds: state.project.columnIds,
+				},
+				{
+					new: true,
+				}
 			);
+			if (!updatedProject) {
+				return Promise.reject(
+					new BaseError({
+						statusCode: 404,
+						description: `projectId ${projectId} not found`,
+					})
+				);
+			}
 		}
-		const columnIds = project.columnIds;
-		if (firstIndex < columnIds.length && secondIndex < columnIds.length) {
-			[columnIds[firstIndex], columnIds[secondIndex]] = [
-				columnIds[secondIndex],
-				columnIds[firstIndex],
-			];
-			await ProjectModel.findByIdAndUpdate(projectId, {
-				columnIds,
-			});
-			return columnIds;
-		} else {
-			return Promise.reject(
-				new BaseError({
-					statusCode: 400,
-					description:
-						"first, and second indices must be less than number of columns",
-				})
-			);
-		}
+		const updatedColumns: IColumn[] = await columnService.moveTickets(
+			state.columns
+		);
+		return {
+			project:
+				state.project.columnIds && state.project.columnIds.length > 0
+					? updatedProject!
+					: state.project,
+			columns: updatedColumns,
+		};
 	} catch (error) {
 		if (error instanceof BaseError) return Promise.reject(error);
 		return Promise.reject(new BaseError({ statusCode: 500 }));

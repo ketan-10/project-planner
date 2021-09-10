@@ -23,21 +23,6 @@ router.patch(
 	ticketController.updateTicket
 );
 
-// swap inside same column
-router.post(
-	"/swap",
-	validator.validateColumnIdPresent,
-	validator.validateTicketIndices,
-	ticketController.swapTickets
-);
-
-// move across columns
-router.post(
-	"/moveacross/:ticketId",
-	validator.validateMoveAcross,
-	ticketController.moveTicketAcrossColumns
-);
-
 // delete one ticket
 router.delete("/:ticketId", ticketController.deleteOneTicket);
 

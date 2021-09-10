@@ -4,5 +4,7 @@ declare module "express-session" {
 	export interface SessionData {
 		userId: string;
 		projectId: string | null;
+		columnIds: string[];
+		ticketIds: string[];
 	}
 }

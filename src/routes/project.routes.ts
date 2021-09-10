@@ -26,4 +26,7 @@ router.patch(
 
 router.delete("/:projectId", projectController.deleteProject);
 
+//TODO add serssion validator:
+router.post("/state", auth.hasProjectOpened, projectController.changeState);
+
 export default router;

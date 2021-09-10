@@ -16,12 +16,6 @@ router.patch(
 	columnController.updateColumn
 );
 
-router.post(
-	"/swap",
-	validator.validateColumnIndices,
-	columnController.swapColumns
-);
-
 router.delete("/:columnId", columnController.deleteColumn);
 
 router.delete("/truncate/:columnId", columnController.truncateColumn);

@@ -29,8 +29,6 @@ import lodash from "lodash";
 import { BaseError } from "../errors/base.error";
 
 import * as columnService from "../services/column.service";
-import * as projectService from "../services/project.service";
-import log from "../util/logger";
 
 export const createColumn = async (req: Request, res: Response) => {
 	try {
@@ -39,6 +37,10 @@ export const createColumn = async (req: Request, res: Response) => {
 			req.session.projectId!,
 			columnName
 		);
+		if (!req.session.columnIds) {
+			req.session.columnIds = [];
+		}
+		req.session.columnIds.push(column._id);
 		return res.status(200).json({
 			success: true,
 			data: column,
@@ -77,31 +79,6 @@ export const updateColumn = async (req: Request, res: Response) => {
 	}
 };
 
-export const swapColumns = async (req: Request, res: Response) => {
-	try {
-		const { firstIndex, secondIndex } = req.body;
-		const columnIds = await projectService.swapColumns(
-			req.session.projectId!,
-			firstIndex,
-			secondIndex
-		);
-		return res.status(200).json({
-			success: true,
-			data: {
-				columnIds,
-			},
-		});
-	} catch (error) {
-		if (error instanceof BaseError) {
-			return res.status(error.statusCode).json({
-				success: false,
-				message: error.description,
-			});
-		}
-		return res.sendStatus(500);
-	}
-};
-
 export const truncateColumn = async (req: Request, res: Response) => {
 	try {
 		const { columnId } = req.params;
@@ -125,6 +102,10 @@ export const deleteColumn = async (req: Request, res: Response) => {
 	try {
 		const { columnId } = req.params;
 		await columnService.deleteColumnById(columnId);
+		req.session.columnIds?.splice(
+			req.session.columnIds.indexOf(columnId),
+			1
+		);
 		return res.status(200).json({
 			success: true,
 			message: `columnId ${columnId} deleted`,

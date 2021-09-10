@@ -4,6 +4,8 @@
 import { Request, Response, NextFunction } from "express";
 import lodash from "lodash";
 import { BaseError } from "../errors/base.error";
+import { IColumn } from "../models/Column";
+import { AssembeledProject } from "../models/Project";
 
 import * as projectService from "../services/project.service";
 import log from "../util/logger";
@@ -80,7 +82,7 @@ export const getAllProjects = async (req: Request, res: Response) => {
 export const openProject = async (req: Request, res: Response) => {
 	try {
 		const { projectId } = req.params;
-		const assembeledProject = await projectService.getOneProject(projectId);
+		const assembeledProject = await projectService.openProject(projectId);
 		req.session.projectId = assembeledProject.project._id; //opened a project
 		return res.status(200).json({
 			status: 200,
@@ -130,6 +132,8 @@ export const deleteProject = async (req: Request, res: Response) => {
 		if (req.session.projectId === projectId) {
 			req.session.projectId = null; //if project is open, close it.
 		}
+		req.session.columnIds = [];
+		req.session.ticketIds = [];
 		return res.status(200).json({
 			success: true,
 			data: lodash.pick(result.toJSON(), [
@@ -157,6 +161,28 @@ export const closeProject = async (req: Request, res: Response) => {
 			message: "project closed",
 		});
 	} catch (error) {
+		return res.sendStatus(500);
+	}
+};
+
+export const changeState = async (req: Request, res: Response) => {
+	try {
+		const { state } = req.body;
+		const updatedState = await projectService.changeState(
+			req.session.projectId!,
+			state
+		);
+		return res.status(200).json({
+			success: true,
+			data: updatedState,
+		});
+	} catch (error) {
+		if (error instanceof BaseError) {
+			return res.status(error.statusCode).json({
+				success: false,
+				message: error.description,
+			});
+		}
 		return res.sendStatus(500);
 	}
 };
