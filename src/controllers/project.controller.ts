@@ -1,35 +1,8 @@
-//TODO add, rename,get all projects, delete project, move column from x-> y
-//TODO validation & error handling
-
-import { Request, Response, NextFunction } from "express";
+import { Request, Response } from "express";
 import lodash from "lodash";
-import { BaseError } from "../errors/base.error";
-import { IColumn } from "../models/Column";
-import { AssembeledProject } from "../models/Project";
 
 import * as projectService from "../services/project.service";
 import log from "../util/logger";
-
-/**
- * ?Add project:
- * id = model.add(project)
- *
- * ?Rename project:
- * id = model.update(project)
- *
- * ?Delete project:
- * for(c: columns) {
- *      delete(c)
- * }
- * model.delete(project)
- *
- * ?Move column x->y
- * columns = model.get(projId)
- * columns[x <--> y]
- *
- * ?Open & close project(delete from session)
- *
- */
 
 export const addProject = async (req: Request, res: Response) => {
 	try {
@@ -37,20 +10,9 @@ export const addProject = async (req: Request, res: Response) => {
 			lodash.pick(req.body, ["projectName", "description"]),
 			req.session.userId!
 		);
-		return res.status(200).json({
-			success: true,
-			data: {
-				projectId,
-			},
-		});
+		return res.sendSuccessWithData({ projectId });
 	} catch (error) {
-		if (error instanceof BaseError) {
-			return res.status(error.statusCode).json({
-				success: false,
-				message: error.description,
-			});
-		}
-		return res.sendStatus(500);
+		return res.sendError(error);
 	}
 };
 
@@ -62,20 +24,9 @@ export const getAllProjects = async (req: Request, res: Response) => {
 		const projects = await projectService.getUserProjects(
 			req.session.userId!
 		);
-		return res.status(200).json({
-			success: true,
-			data: {
-				projects,
-			},
-		});
+		return res.sendSuccessWithData({ projects });
 	} catch (error) {
-		if (error instanceof BaseError) {
-			return res.status(error.statusCode).json({
-				success: false,
-				message: error.description,
-			});
-		}
-		return res.sendStatus(500);
+		return res.sendError(error);
 	}
 };
 
@@ -84,18 +35,9 @@ export const openProject = async (req: Request, res: Response) => {
 		const { projectId } = req.params;
 		const assembeledProject = await projectService.openProject(projectId);
 		req.session.projectId = assembeledProject.project._id; //opened a project
-		return res.status(200).json({
-			status: 200,
-			data: assembeledProject,
-		});
+		return res.sendSuccessWithData(assembeledProject);
 	} catch (error) {
-		if (error instanceof BaseError) {
-			return res.status(error.statusCode).json({
-				success: false,
-				message: error.description,
-			});
-		}
-		return res.sendStatus(500);
+		return res.sendError(error);
 	}
 };
 
@@ -107,18 +49,11 @@ export const updateProject = async (req: Request, res: Response) => {
 			projectName,
 			description,
 		});
-		return res.status(200).json({
-			success: true,
-			data: lodash.pick(updatedProject, ["projectName", "description"]),
-		});
+		return res.sendSuccessWithData(
+			lodash.pick(updatedProject, ["projectName", "description"])
+		);
 	} catch (error) {
-		if (error instanceof BaseError) {
-			return res.status(error.statusCode).json({
-				success: false,
-				message: error.description,
-			});
-		}
-		return res.sendStatus(500);
+		return res.sendError(error);
 	}
 };
 
@@ -134,34 +69,20 @@ export const deleteProject = async (req: Request, res: Response) => {
 		}
 		req.session.columnIds = [];
 		req.session.ticketIds = [];
-		return res.status(200).json({
-			success: true,
-			data: lodash.pick(result.toJSON(), [
-				"_id",
-				"projectName",
-				"description",
-			]),
-		});
+		return res.sendSuccessWithData(
+			lodash.pick(result.toJSON(), ["_id", "projectName", "description"])
+		);
 	} catch (error) {
-		if (error instanceof BaseError) {
-			return res.status(error.statusCode).json({
-				success: false,
-				message: error.description,
-			});
-		}
-		return res.sendStatus(500);
+		return res.sendError(error);
 	}
 };
 
 export const closeProject = async (req: Request, res: Response) => {
 	try {
 		req.session.projectId = null;
-		return res.status(200).json({
-			success: true,
-			message: "project closed",
-		});
+		return res.sendSuccess("project closed");
 	} catch (error) {
-		return res.sendStatus(500);
+		return res.sendError(error);
 	}
 };
 
@@ -172,17 +93,8 @@ export const changeState = async (req: Request, res: Response) => {
 			req.session.projectId!,
 			state
 		);
-		return res.status(200).json({
-			success: true,
-			data: updatedState,
-		});
+		return res.sendSuccessWithData(updatedState);
 	} catch (error) {
-		if (error instanceof BaseError) {
-			return res.status(error.statusCode).json({
-				success: false,
-				message: error.description,
-			});
-		}
-		return res.sendStatus(500);
+		return res.sendError(error);
 	}
 };

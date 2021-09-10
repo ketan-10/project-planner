@@ -1,11 +1,5 @@
-//TODO add, rename, delete ticket
-/**
- * ?self explanatory
- */
-
 import { Request, Response } from "express";
 
-import { BaseError } from "../errors/base.error";
 import * as ticketService from "../services/ticket.service";
 import * as columnService from "../services/column.service";
 import log from "../util/logger";
@@ -21,18 +15,9 @@ export const createTicket = async (req: Request, res: Response) => {
 			req.session.ticketIds = [];
 		}
 		req.session.ticketIds.push(ticketId);
-		return res.status(200).json({
-			success: true,
-			data: { ticketId },
-		});
+		return res.sendSuccessWithData({ ticketId });
 	} catch (error) {
-		if (error instanceof BaseError) {
-			return res.status(error.statusCode).json({
-				success: false,
-				message: error.description,
-			});
-		}
-		return res.sendStatus(500);
+		return res.sendError(error);
 	}
 };
 
@@ -44,18 +29,9 @@ export const updateTicket = async (req: Request, res: Response) => {
 			title,
 			description,
 		});
-		return res.status(200).json({
-			success: true,
-			data: updatedTicket,
-		});
+		return res.sendSuccessWithData(updatedTicket.toJSON());
 	} catch (error) {
-		if (error instanceof BaseError) {
-			return res.status(error.statusCode).json({
-				success: false,
-				message: error.description,
-			});
-		}
-		return res.sendStatus(500);
+		return res.sendError(error);
 	}
 };
 
@@ -67,17 +43,8 @@ export const deleteOneTicket = async (req: Request, res: Response) => {
 			req.session.ticketIds.indexOf(ticketId),
 			1
 		);
-		return res.status(200).json({
-			success: true,
-			message: `ticketId ${ticketId} removed`,
-		});
+		return res.sendSuccess(`ticketId ${ticketId} removed`);
 	} catch (error) {
-		if (error instanceof BaseError) {
-			return res.status(error.statusCode).json({
-				success: false,
-				message: error.description,
-			});
-		}
-		return res.sendStatus(500);
+		return res.sendError(error);
 	}
 };
