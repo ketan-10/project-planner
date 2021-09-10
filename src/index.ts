@@ -20,6 +20,7 @@ import userRoutes from "./routes/user.routes";
 import columnRoutes from "./routes/column.routes";
 import ticketRoutes from "./routes/ticket.routes";
 import { apiresponse } from "./middlewares/api.mw";
+import log from "./util/logger";
 
 const RedisStore = connectRedis(session);
 const redisClient = redis.createClient({
@@ -60,11 +61,6 @@ app.use(
 	})
 );
 
-mongoose
-	.connect(MONGO_URL)
-	.then((_result) => console.log("connected to mongoDB!"))
-	.catch((error) => console.log(error));
-
 app.use(apiresponse);
 
 app.use("/users", userRoutes);
@@ -72,6 +68,18 @@ app.use("/projects", projectRoutes);
 app.use("/columns", columnRoutes);
 app.use("/tickets", ticketRoutes);
 
-app.use((_, res) => res.sendStatus(404));
+const startServer = async () => {
+	try {
+		await mongoose.connect(MONGO_URL);
+		log.info("connected to mongo");
+		await redisClient.ping();
+		log.info("connected to redis");
+		app.listen(PORT, () => console.log(`server listening on port ${PORT}`));
+	} catch (error) {
+		log.error(error);
+	}
+};
 
-app.listen(PORT, () => console.log(`server listening on port ${PORT}`));
+app.use((_, res) => res.sendAPIStatus(404));
+
+startServer();
