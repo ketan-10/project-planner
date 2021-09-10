@@ -71,7 +71,7 @@ app.use("/users", userRoutes);
 app.use("/projects", projectRoutes);
 app.use("/columns", columnRoutes);
 app.use("/tickets", ticketRoutes);
-//if no route returns response, send 404
+
 app.use((_, res) => res.sendStatus(404));
 
 app.listen(PORT, () => console.log(`server listening on port ${PORT}`));
