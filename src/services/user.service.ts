@@ -12,7 +12,7 @@ export const saveUser = async (
 	try {
 		const savedUser = await UserModel.create({
 			username,
-			password: await bcrypt.hash(password, 14),
+			password: await bcrypt.hash(password, 10),
 		});
 		return savedUser;
 	} catch (error: any) {
