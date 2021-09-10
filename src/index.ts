@@ -19,7 +19,7 @@ import projectRoutes from "./routes/project.routes";
 import userRoutes from "./routes/user.routes";
 import columnRoutes from "./routes/column.routes";
 import ticketRoutes from "./routes/ticket.routes";
-import { apiresponse } from "./middlewares/apiresponse";
+import { apiresponse } from "./middlewares/api.mw";
 
 const RedisStore = connectRedis(session);
 const redisClient = redis.createClient({
