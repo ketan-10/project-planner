@@ -9,7 +9,7 @@ declare global {
 			userId: string;
 			projectId: string;
 		}
-		export interface Response {
+		export interface Response<_ = any> {
 			sendSuccess(message: string): Response<APIResponse>;
 			sendSuccessWithData(data: object): Response<APIResponse>;
 			sendError(error: any): Response<APIResponse>;
