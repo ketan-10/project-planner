@@ -1,5 +1,5 @@
 import { BaseError } from "../errors/base.error";
-import ProjectModel, { AssembeledProject, IProject } from "../models/Project";
+import ProjectModel, { AssembledProject, IProject } from "../models/Project";
 import * as userService from "../services/user.service";
 import * as columnService from "../services/column.service";
 import * as ticketService from "../services/ticket.service";
@@ -59,7 +59,7 @@ export const getProjectByProjectId = async (
 
 export const openProject = async (
 	projectId: string
-): Promise<AssembeledProject> => {
+): Promise<AssembledProject> => {
 	try {
 		const project = await ProjectModel.findById(projectId);
 		if (!project) {
@@ -257,8 +257,8 @@ export const deleteColumnIdFromProject = async (
 
 export const changeState = async (
 	projectId: string,
-	state: AssembeledProject
-): Promise<Partial<AssembeledProject>> => {
+	state: AssembledProject
+): Promise<Partial<AssembledProject>> => {
 	try {
 		/**
 		 * project service will move columns.

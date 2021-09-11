@@ -33,9 +33,9 @@ export const getAllProjects = async (req: Request, res: Response) => {
 export const openProject = async (req: Request, res: Response) => {
 	try {
 		const { projectId } = req.params;
-		const assembeledProject = await projectService.openProject(projectId);
-		req.session.projectId = assembeledProject.project._id; //opened a project
-		return res.sendSuccessWithData(assembeledProject);
+		const assembledProject = await projectService.openProject(projectId);
+		req.session.projectId = assembledProject.project._id; //opened a project
+		return res.sendSuccessWithData(assembledProject);
 	} catch (error) {
 		return res.sendError(error);
 	}

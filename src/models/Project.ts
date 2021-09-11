@@ -9,7 +9,7 @@ export interface IProject extends Document {
 	columnIds: Array<string>;
 }
 
-export interface AssembeledProject {
+export interface AssembledProject {
 	project: IProject;
 	columns: IColumn[];
 	tickets: ITicket[];
