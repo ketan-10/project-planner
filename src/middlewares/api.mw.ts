@@ -1,10 +1,11 @@
 import { NextFunction, Request, Response } from "express";
 import status from "http-status";
 import { BaseError } from "../errors/base.error";
+import { APIResponse } from "../types/APIResponse";
 
 export const apiresponse = (
 	_req: Request,
-	res: Response,
+	res: Response<APIResponse>,
 	next: NextFunction
 ) => {
 	res.sendSuccess = (message: string) => {

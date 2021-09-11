@@ -9,13 +9,13 @@ declare global {
 			userId: string;
 			projectId: string;
 		}
-		export interface Response<_ = any> {
-			sendSuccess(message: string): Response<APIResponse>;
-			sendSuccessWithData(data: object): Response<APIResponse>;
-			sendError(error: any): Response<APIResponse>;
-			sendValidationErrors(errors: object): Response<APIResponse>;
-			sendAPIStatus(statusCode: number): Response<APIResponse>;
-			sendBadRequest(message: string): Response<APIResponse>;
+		export interface Response<R = APIResponse> {
+			sendSuccess(message: string): Response<R>;
+			sendSuccessWithData(data: object): Response<R>;
+			sendError(error: any): Response<R>;
+			sendValidationErrors(errors: object): Response<R>;
+			sendAPIStatus(statusCode: number): Response<R>;
+			sendBadRequest(message: string): Response<R>;
 		}
 	}
 }
