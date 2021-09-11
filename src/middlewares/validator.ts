@@ -7,7 +7,7 @@ import {
 	validationResult,
 } from "express-validator";
 import { BaseError } from "../errors/base.error";
-import { AssembeledProject } from "../models/Project";
+import { AssembledProject } from "../models/Project";
 import log from "../util/logger";
 
 export const validateHeader = (
@@ -37,11 +37,11 @@ export const validatePresentInBody = (...args: string[]): RequestHandler => {
 					.run(req);
 			});
 			await Promise.all(validations);
-			const validatonErrors = validationResult(req);
-			if (validatonErrors && !validatonErrors.isEmpty()) {
+			const validationErrors = validationResult(req);
+			if (validationErrors && !validationErrors.isEmpty()) {
 				return res.status(400).json({
 					success: false,
-					errors: validatonErrors["errors"],
+					errors: validationErrors["errors"],
 				});
 			}
 		} catch (error) {
@@ -63,11 +63,11 @@ export const validateCharacterLength = (
 					`${parameter} should not be greater than ${max} characters`
 				)
 				.run(req);
-			const validatonErrors = validationResult(req);
-			if (validatonErrors && !validatonErrors.isEmpty()) {
+			const validationErrors = validationResult(req);
+			if (validationErrors && !validationErrors.isEmpty()) {
 				return res.status(400).json({
 					success: false,
-					errors: validatonErrors["errors"],
+					errors: validationErrors["errors"],
 				});
 			}
 		} catch (error) {
@@ -90,11 +90,11 @@ export const validateNumericRange = (
 				.isFloat({ min, max })
 				.withMessage(`${parameter} must be between ${min} and ${max} `)
 				.run(req);
-			const validatonErrors = validationResult(req);
-			if (validatonErrors && !validatonErrors.isEmpty()) {
+			const validationErrors = validationResult(req);
+			if (validationErrors && !validationErrors.isEmpty()) {
 				return res.status(400).json({
 					success: false,
-					errors: validatonErrors["errors"],
+					errors: validationErrors["errors"],
 				});
 			}
 		} catch (error) {
@@ -111,11 +111,11 @@ export const validatePathParamPresent = (parameter: string): RequestHandler => {
 				.notEmpty()
 				.withMessage(`${parameter} must be present in path`)
 				.run(req);
-			const validatonErrors = validationResult(req);
-			if (validatonErrors && !validatonErrors.isEmpty()) {
+			const validationErrors = validationResult(req);
+			if (validationErrors && !validationErrors.isEmpty()) {
 				return res.status(400).json({
 					success: false,
-					errors: validatonErrors["errors"],
+					errors: validationErrors["errors"],
 				});
 			}
 		} catch (error) {
@@ -131,7 +131,7 @@ export const validateProjectState = (
 	next: NextFunction
 ) => {
 	try {
-		const state: Partial<AssembeledProject> = req.body.state;
+		const state: Partial<AssembledProject> = req.body.state;
 		if (
 			state.project &&
 			state?.project.columnIds &&
@@ -172,7 +172,7 @@ export const validateProjectState = (
 				if (!column.ticketIds) {
 					throw new BaseError({
 						statusCode: 400,
-						description: `ticketIds should be present for coulumnid ${column._id}`,
+						description: `ticketIds should be present for columnId ${column._id}`,
 					});
 				}
 				column.ticketIds.forEach((ticketId) => {

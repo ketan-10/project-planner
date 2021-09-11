@@ -34,7 +34,7 @@ export const logout = async (req: Request, res: Response) => {
 			if (error) {
 				return res.sendStatus(500);
 			}
-			res.clearCookie("connect.sid"); //clear coookie
+			res.clearCookie("connect.sid"); //clear cookie
 			return res.sendSuccess("logged out successfully");
 		});
 	} catch (error) {
